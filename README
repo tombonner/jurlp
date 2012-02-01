@@ -50,4 +50,4 @@ $("body").prepend("<a href='http://www.example.com/'></a>");
 $("a:eq(0)").jurlp("unwatch");
 
 // Parse an elements text for URLs and create/return anchor elements
-$("<div>www.example.com</div>").jurlp();
+$("<div>www.example.com</div>").jurlp(); // <- Note! This parser is not using jurlp()! :)
