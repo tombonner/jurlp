@@ -1,0 +1,8 @@
+JQuery URL parser plugin for parsing, manipulating, filtering and monitoring URLs in document.location.href and href attributes within anchor elements, as well as creating anchor elements from URLs found in arbitrary element HTML/text.
+
+Repository overview:
+
+/jurlp.js - Full source.
+/jurlp.min.js - jurlp.js, compressed using YUI Compressor.
+/jurlp.html - QUnit test suite.
+/doc/index.html - HTML documentation.
