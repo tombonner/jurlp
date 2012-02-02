@@ -3,11 +3,15 @@ JQuery URL parser.
 
 JQuery URL parser plugin for parsing, manipulating, filtering and monitoring URLs in href and src attributes within arbitrary elements (including document.location.href), as well as creating anchor elements from URLs found in HTML/text.
 
-**Version:**	1.0.2
+**Version**
 
-**License:**	Copyright (C) 2012, Thomas James Bonner (tom.bonner@gmail.com).
+1.0.2
 
-**MIT License:**
+**License**
+
+Copyright (C) 2012, Thomas James Bonner (tom.bonner@gmail.com).
+
+**MIT License**
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
@@ -28,11 +32,18 @@ To view/run the unit test for the parser interface see http://tombonner.github.c
 Files
 -----
 
-* jurlp.js - Source.
-* jurlp.min.js - jurlp.js compressed using YUI Compressor.
-* jurlp.html - QUnit test suite.
-* doc/index.html - Documentation.
-* README.md - This file.
+    / ................. Project root.
+    |-jurlp.js ........ JQuery URL parser plugin source.
+    |-jurlp.min.js .... jurlp.js compressed using YUI Compressor.
+    |-jurlp.html ...... JQuery URL parser plugin QUnit test suite.
+    |-README.me ....... This file.
+    |-doc/ ............ Natural Docs output.
+    |-doc/index.html .. Documentation main-page.
+
+Requirements
+------------
+
+[JQuery](http://jquery.com/)
 
 URL naming scheme
 -----------------
@@ -41,17 +52,13 @@ A quick quide to URL nomenclature in this plugin.
 
 Throughout this plugin, URLs are segmented and refered to in the following manner;
 
-``` javascript
-
-http://www.example.com:8080/path/file.name?query=string#anchor
-|_____||_____________||___||_____________||___________||_____|
-   |         |          |         |             |         |
-scheme      host       port      path         query   fragment
-|____________________________________________________________|
-                              |
-                             url
-
-```
+    http://www.example.com:8080/path/file.name?query=string#anchor
+    |_____||_____________||___||_____________||___________||_____|
+       |         |          |         |             |         |
+    scheme      host       port      path         query   fragment
+    |____________________________________________________________|
+                                  |
+                                 url
 
 * **Scheme** - Contains the protocol identifier (i.e.  "https://", "ftp://").
 * **Host** - Contains the name or IP address of the host server (i.e.  "www.example.com", or "127.0.0.1").
