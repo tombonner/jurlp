@@ -4,13 +4,14 @@ JQuery URL parser.
 JQuery URL parser plugin for parsing, manipulating, filtering and monitoring URLs in href and src attributes within arbitrary elements (including document.location.href), as well as creating anchor elements from URLs found in HTML/text.
 
 **Version:**	1.0.2
-**License:**	Copyright © 2012, Thomas James Bonner (tom.bonner@gmail.com).
+
+**License:**	Copyright (C) 2012, Thomas James Bonner (tom.bonner@gmail.com).
 
 **MIT License:**
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 URL overview.
 
 URL naming scheme
@@ -32,19 +33,19 @@ scheme      host       port      path         query   fragment
 
 ```
 
-* **Scheme** - Contains the protocol identifier (i.e.  “https://”, “ftp://”).
-* **Host** - Contains the name or IP address of the host server (i.e.  “www.example.com”, or “127.0.0.1”).
-* **Port** - Contains the listening port number for the host server (i.e.  “80”, or “8080”).  Note that an empty port value implies the default port (80).
-* **Path** - Contains the file path (i.e.  “/index.html”, or “/”).
-* **Query** - Contains any parameters passed in the query (i.e.  “?param1=value1&param2=value2”).  This segment may be empty.
-* **Fragment** - Contains any anchors/hash tags (i.e.  “#elementname”).  This segment may be empty.
+* **Scheme** - Contains the protocol identifier (i.e.  "https://", "ftp://").
+* **Host** - Contains the name or IP address of the host server (i.e.  "www.example.com", or "127.0.0.1").
+* **Port** - Contains the listening port number for the host server (i.e.  "80", or "8080").  Note that an empty port value implies the default port (80).
+* **Path** - Contains the file path (i.e.  "/index.html", or "/").
+* **Query** - Contains any parameters passed in the query (i.e.  "?param1=value1&param2=value2").  This segment may be empty.
+* **Fragment** - Contains any anchors/hash tags (i.e.  "#elementname").  This segment may be empty.
 
 URL Objects
 -----------
 
 URL object definition.
 
-For the purposes of this plugin, URLs can be represented either as a string, for example “http://www.example.com:8080/path/file.name?query=string#anchor”, or as an object;
+For the purposes of this plugin, URLs can be represented either as a string, for example "http://www.example.com:8080/path/file.name?query=string#anchor", or as an object;
 
 ``` javascript
 
@@ -165,7 +166,7 @@ $(document).jurlp("url");
 
 ```
 
-Similarly, the document URL can be modified by the plugin, but it is worth noting that changes will not be directly applied to document.location.href until goto is explicitly called on the element, and instead, a working copy of the URL is stored under the documents “data-href” attribute.
+Similarly, the document URL can be modified by the plugin, but it is worth noting that changes will not be directly applied to document.location.href until goto is explicitly called on the element, and instead, a working copy of the URL is stored under the documents "data-href" attribute.
 
 ``` javascript
 
@@ -177,12 +178,12 @@ $(document).jurlp("goto");
 
 ```
 
-Parsing elements with an “href” or “src” attribute.
+Parsing elements with an "href" or "src" attribute.
 ---------------------------------------------------
 
-Parsing “href” or “src” attributes.
+Parsing "href" or "src" attributes.
 
-Elements with an “href” or “src” attribute (i.e.  <a href=””>, <base href=””>, <link href=””>, <img src=””>, <script src=””> or <iframe src=””>), can be parsed by specifying the element(s) to the parser in the following manner;
+Elements with an "href" or "src" attribute (i.e.  <a href="">, <base href="">, <link href="">, <img src="">, <script src=""> or <iframe src="">), can be parsed by specifying the element(s) to the parser in the following manner;
 
 ``` javascript
 
@@ -191,7 +192,7 @@ $("a").jurlp("url");
 
 ```
 
-Any modifications made to the URL will modify the relevant “href” or “src” attribute directly.  If you want to visit the URL within an elements “href” or “src” attribute, it is possible to call goto on the element.
+Any modifications made to the URL will modify the relevant "href" or "src" attribute directly.  If you want to visit the URL within an elements "href" or "src" attribute, it is possible to call goto on the element.
 
 ``` javascript
 
