@@ -16,13 +16,24 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 URL overview.
 
-**Full documentation:**
+Documentation
+-------------
 
-http://tombonner.github.com/jurlp/doc.1.0.2/index.html
+To browse the full version of the documentation see http://tombonner.github.com/jurlp/doc.1.0.2/index.html
 
-**Unit test:**
+Unit test
+---------
 
-http://tombonner.github.com/jurlp/jurlp.html
+To view/run the unit test for the parser interface see http://tombonner.github.com/jurlp/jurlp.html
+
+Files
+-----
+
+* jurlp.js - Source.
+* jurlp.min.js - jurlp.js compressed using YUI Compressor.
+* jurlp.html - QUnit test suite.
+* doc/index.html - Documentation.
+* README.md - This file.
 
 URL naming scheme
 -----------------
