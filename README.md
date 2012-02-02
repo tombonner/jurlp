@@ -183,7 +183,7 @@ Parsing elements with an "href" or "src" attribute.
 
 Parsing "href" or "src" attributes.
 
-Elements with an "href" or "src" attribute (i.e.  <a href="">, <base href="">, <link href="">, <img src="">, <script src=""> or <iframe src="">), can be parsed by specifying the element(s) to the parser in the following manner;
+Elements with an "href" or "src" attribute (i.e. "<a href="">", "<base href="">", "<link href="">", "<img src="">", "<script src="">" or "<iframe src="">"), can be parsed by specifying the element(s) to the parser in the following manner;
 
 ``` javascript
 
