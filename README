@@ -1,36 +1,106 @@
-JQuery URL parser plugin for parsing, manipulating, filtering and monitoring URLs in document.location.href and href attributes within anchor elements, as well as creating anchor elements from URLs found in arbitrary element HTML/text.
+JQuery URL parser.
+==================
 
-Repository overview:
+JQuery URL parser plugin for parsing, manipulating, filtering and monitoring URLs in href and src attributes within arbitrary elements (including document.location.href), as well as creating anchor elements from URLs found in HTML/text.
 
-/jurlp.js - Full source.
-/jurlp.min.js - jurlp.js, compressed using YUI Compressor.
-/jurlp.html - QUnit test suite.
-/doc/index.html - HTML documentation.
+**Version:**	1.0.2
+**License:**	Copyright © 2012, Thomas James Bonner (tom.bonner@gmail.com).
 
-Quick overview:
+**MIT License:**
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+URL overview.
+
+URL naming scheme
+-----------------
+
+A quick quide to URL nomenclature in this plugin.
+
+Throughout this plugin, URLs are segmented and refered to in the following manner;
+
+``` javascript
+
+http://www.example.com:8080/path/file.name?query=string#anchor
+|_____||_____________||___||_____________||___________||_____|
+   |         |          |         |             |         |
+scheme      host       port      path         query   fragment
+|____________________________________________________________|
+                              |
+                             url
+
+```
+
+* **Scheme** - Contains the protocol identifier (i.e.  “https://”, “ftp://”).
+* **Host** - Contains the name or IP address of the host server (i.e.  “www.example.com”, or “127.0.0.1”).
+* **Port** - Contains the listening port number for the host server (i.e.  “80”, or “8080”).  Note that an empty port value implies the default port (80).
+* **Path** - Contains the file path (i.e.  “/index.html”, or “/”).
+* **Query** - Contains any parameters passed in the query (i.e.  “?param1=value1&param2=value2”).  This segment may be empty.
+* **Fragment** - Contains any anchors/hash tags (i.e.  “#elementname”).  This segment may be empty.
+
+URL Objects
+-----------
+
+URL object definition.
+
+For the purposes of this plugin, URLs can be represented either as a string, for example “http://www.example.com:8080/path/file.name?query=string#anchor”, or as an object;
+
+``` javascript
+
+{
+    scheme: "http://"
+    host: "www.example.com"
+    port: "8080" // Note the missing leading colon!
+    path: "/path/file.name"
+    query: "?query=string"
+    fragment: "#anchor"
+}
+
+```
+
+Therefore, wherever URLs are supplied as a parameter to the plugin via the url or proxy methods, either a string or object representation or the URL may be supplied.
+
+URL objects that have been returned via the parser interface can easily be converted to a string by calling the objects toString() method.
+
+Example:
+
+``` javascript
+
+// Parse the document.location.href URL, and convert it back to a string again.
+$(document).jurlp("url").toString();
+
+```
+
+Quick overview
+--------------
+
+Useful example code.
+
+``` javascript
 
 // Parse and set the element(s) URL
 $("a").jurlp("url");
 $("a").jurlp("url", "http://www.example.com/");
 
-// Get or set individual URL sements
-$(document).jurlp("scheme");
-$(document).jurlp("scheme", "https://");
+// Get or set individual URL segments for the element(s)
+$("a").jurlp("scheme");
+$("a").jurlp("scheme", "https://");
 
-$(document).jurlp("host");
-$(document).jurlp("host", "www.example.com");
+$("a").jurlp("host");
+$("a").jurlp("host", "www.example.com");
 
-$(document).jurlp("port");
-$(document).jurlp("port", "8080");
+$("a").jurlp("port");
+$("a").jurlp("port", "8080");
 
-$(document).jurlp("path");
-$(document).jurlp("path", "../file.name");
+$("a").jurlp("path");
+$("a").jurlp("path", "../file.name");
 
-$(document).jurlp("query");
-$(document).jurlp("query", {"param":"value"});
+$("a").jurlp("query");
+$("a").jurlp("query", {"param":"value"});
 
-$(document).jurlp("fragment");
-$(document).jurlp("fragment", "elementid");
+$("a").jurlp("fragment");
+$("a").jurlp("fragment", "elementid");
 
 // Filter on URL segments
 $("a").jurlp("filter", "scheme", "^=", "http")
@@ -41,13 +111,165 @@ $("a").jurlp("filter", "scheme", "^=", "http")
       .jurlp("filter", "fragment", "regex", /(\#)/);
 
 // Watch a selector for new nodes
-$("a:eq(0)").jurlp("watch", function(element, selector){
-}).jurlp("filter", "host", "=", "www.example.com")
-  .jurlp("query",{"found":"example"});
+$("a:eq(0)").jurlp("watch", function(element, selector){})
+            .jurlp("filter", "host", "=", "www.example.com")
+            .jurlp("query",{"found":"example"});
 
 $("body").prepend("<a href='http://www.example.com/'></a>");
 
 $("a:eq(0)").jurlp("unwatch");
 
-// Parse an elements text for URLs and create/return anchor elements
-$("<div>www.example.com</div>").jurlp(); // <- Note! This parser is not using jurlp()! :)
+// Parse an element's text for URLs and create/return anchor elements
+$("<div>www.example.com</div>").jurlp();
+
+// Get an interface for parsing the URL
+url = $.jurlp("www.example.com");
+
+// Parse the URL to an object.
+url.url();
+
+// Get the URL scheme.
+url.scheme();
+
+// Get the URL host.
+url.host();
+
+// Get the URL port.
+url.port();
+
+// Get the URL path.
+url.path();
+
+// Get the URL query.
+url.query();
+
+// Get a specific parameter value from the URL query.
+url.query().parameter;
+
+// Get the URL fragment.
+url.fragment();
+
+```
+
+Parsing document.location.href
+------------------------------
+
+Parsing the document URL.
+
+The document URL (document.location.href) can be parsed by specifying the HTML document element to the parser in the following manner;
+
+``` javascript
+
+// Parse the document.location.href URL string into a URL object
+$(document).jurlp("url");
+
+```
+
+Similarly, the document URL can be modified by the plugin, but it is worth noting that changes will not be directly applied to document.location.href until goto is explicitly called on the element, and instead, a working copy of the URL is stored under the documents “data-href” attribute.
+
+``` javascript
+
+// Does not modify document.location.href (updates $(document).data("href"))
+$(document).jurlp("url", "www.example.com");
+
+// Does modify document.location.href (from $(document).data("href"))
+$(document).jurlp("goto");
+
+```
+
+Parsing elements with an “href” or “src” attribute.
+---------------------------------------------------
+
+Parsing “href” or “src” attributes.
+
+Elements with an “href” or “src” attribute (i.e.  <a href=””>, <base href=””>, <link href=””>, <img src=””>, <script src=””> or <iframe src=””>), can be parsed by specifying the element(s) to the parser in the following manner;
+
+``` javascript
+
+// Parse all anchor element URLs into an array
+$("a").jurlp("url");
+
+```
+
+Any modifications made to the URL will modify the relevant “href” or “src” attribute directly.  If you want to visit the URL within an elements “href” or “src” attribute, it is possible to call goto on the element.
+
+``` javascript
+
+// Directly set the first anchor elements URL, and then goto it!
+$("a:eq(0)").jurlp("url", "www.example.com").jurlp("goto");
+
+```
+
+Parsing element text/HTML.
+--------------------------
+
+Parsing text/HTML for URLs.
+
+It is possible for the URL parser to find URLs within text/HTML, and convert them into HTML anchor elements.
+
+``` javascript
+
+// Parse the HTML for URLs, and convert all URLs found in the text to anchors.
+$("<div>Here are URLs: www.example1.com, www.example2.com</div>").jurlp();
+
+// HTML becomes:
+// <div>
+//     Here are URLs:
+//     <a href="http://www.example1.com/" class="jurlp-no-watch">www.example1.com</a>,
+//     <a href="http://www.example2.com/" class="jurlp-no-watch">www.example2.com</a>
+// </div>
+
+```
+
+Parsing URL strings directly.
+-----------------------------
+
+How to directly parse, modify or monitor an arbitrary URL string.
+
+``` javascript
+
+// Get an interface for parsing the document URL...
+var url = $.jurlp();
+
+// .. or get an interface for parsing your own URL.
+url = $.jurlp("www.example.com");
+
+// Parse the URL to an object.
+url.url();
+
+// Get the URL scheme.
+url.scheme();
+
+// Get the URL host.
+url.host();
+
+// Get the URL port.
+url.port();
+
+// Get the URL path.
+url.path();
+
+// Get the URL query.
+url.query();
+
+// Get a specific parameter value from the URL query.
+url.query().parameter;
+
+// Get the URL fragment.
+url.fragment();
+
+// Create a watch for new URLs that contain "example.com" in the host name
+var watch = $.jurlp("example.com").watch(function(element, selector){
+    console.log("Found example.com URL!", element, selector);
+});
+
+// We can even apply filters to the watch to be sure!
+watch.jurlp("filter", "host", "*=", "example.com");
+
+// Append a new URL, which will trigger the watch
+$("body").append("<a href=\"www.example.com\"></a>");
+
+// Stop watching for "example.com" URLs.
+watch.jurlp("unwatch");
+
+```

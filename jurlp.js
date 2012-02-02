@@ -4,7 +4,7 @@
  *
  *	Title:	JQuery URL parser.
  *
- * 	JQuery URL parser plugin for parsing, manipulating, filtering and monitoring URLs in document.location.href and href attributes within anchor elements, as well as creating anchor elements from URLs found in arbitrary element HTML/text.
+ * 	JQuery URL parser plugin for parsing, manipulating, filtering and monitoring URLs in href and src attributes within arbitrary elements (including document.location.href), as well as creating anchor elements from URLs found in HTML/text.
  *
  *	About: Authors
  *
@@ -14,7 +14,7 @@
  *
  *	About: Version
  *
- *	1.0.1
+ *	1.0.2
  *
  *	About: License
  *
@@ -105,7 +105,92 @@
  *
  *	(end code)
  *
- *	Section: document.location.href
+ */
+ 
+/**
+ *
+ *	Section: Quick overview
+ *
+ *	Useful code.
+ *
+ *	(start code)
+ *
+ *	// Parse and set the element(s) URL
+ *	$("a").jurlp("url");
+ *	$("a").jurlp("url", "http://www.example.com/");
+ *	
+ *	// Get or set individual URL segments for the element(s)
+ *	$("a").jurlp("scheme");
+ *	$("a").jurlp("scheme", "https://");
+ *	
+ *	$("a").jurlp("host");
+ *	$("a").jurlp("host", "www.example.com");
+ *	
+ *	$("a").jurlp("port");
+ *	$("a").jurlp("port", "8080");
+ *	
+ *	$("a").jurlp("path");
+ *	$("a").jurlp("path", "../file.name");
+ *	
+ *	$("a").jurlp("query");
+ *	$("a").jurlp("query", {"param":"value"});
+ *	
+ *	$("a").jurlp("fragment");
+ *	$("a").jurlp("fragment", "elementid");
+ *	
+ *	// Filter on URL segments
+ *	$("a").jurlp("filter", "scheme", "^=", "http")
+ *	      .jurlp("filter", "host", "=", "www.example.com")
+ *	      .jurlp("filter", "port", "!=", "8080")
+ *	      .jurlp("filter", "path", "$=", ".html")
+ *	      .jurlp("filter", "query", "*=", "param=value")
+ *	      .jurlp("filter", "fragment", "regex", /(\#)/);
+ *	
+ *	// Watch a selector for new nodes
+ *	$("a:eq(0)").jurlp("watch", function(element, selector){})
+ *	            .jurlp("filter", "host", "=", "www.example.com")
+ *	            .jurlp("query",{"found":"example"});
+ *	
+ *	$("body").prepend("<a href='http://www.example.com/'></a>");
+ *	
+ *	$("a:eq(0)").jurlp("unwatch");
+ *	
+ *	// Parse an element's text for URLs and create/return anchor elements
+ *	$("<div>www.example.com</div>").jurlp();
+ *
+ *	// Get an interface for parsing the URL
+ *	url = $.jurlp("www.example.com");
+ *
+ *	// Parse the URL to an object.
+ *	url.url();
+ *
+ *	// Get the URL scheme.
+ *	url.scheme();
+ *
+ *	// Get the URL host.
+ *	url.host();
+ *
+ *	// Get the URL port.
+ *	url.port();
+ *
+ *	// Get the URL path.
+ *	url.path();
+ *
+ *	// Get the URL query.
+ *	url.query();
+ *
+ *	// Get a specific parameter value from the URL query.
+ *	url.query().parameter;
+ *
+ *	// Get the URL fragment.
+ *	url.fragment();
+ *
+ *	(end code)
+ *
+ **/
+
+/**
+ *	Section: Parsing document.location.href
  *
  *	Parsing the document URL.
  *
@@ -130,11 +215,14 @@
  *
  *	(end code)
  *
- *	Section: a href
+ */
+ 
+/**
+ *	Section: Parsing elements with an "href" or "src" attribute.
  *
- *	Parsing anchor elements.
+ *	Parsing "href" or "src" attributes.
  *
- *	Anchor elements can be parsed by specifying the HTML anchor element(s) to the parser in the following manner;
+ *	Elements with an "href" or "src" attribute (i.e. <a href="">, <base href="">, <link href="">, <img src="">, <script src=""> or <iframe src="">), can be parsed by specifying the element(s) to the parser in the following manner;
  *
  *	(start code)
  *
@@ -143,7 +231,7 @@
  *
  *	(end code)
  *
- *	Similarly, the anchor elements URL can be modified by the plugin, and any changes will be made directly to the element "href" attribute. If you want to visit an anchor elements URL, it is possible to call <goto> on the element.
+ *	Any modifications made to the URL will modify the relevant "href" or "src" attribute directly. If you want to visit the URL within an elements "href" or "src" attribute, it is possible to call <goto> on the element.
  *
  *	(start code)
  *
@@ -152,6 +240,86 @@
  *
  *	(end code)
  *
+ */
+
+/**
+ *	Section: Parsing element text/HTML.
+ *
+ *	Parsing text/HTML for URLs.
+ *
+ *	It is possible for the URL parser to find URLs within text/HTML, and convert them into HTML anchor elements.
+ *
+ *	(start code)
+ *
+ *	// Parse the HTML for URLs, and convert all URLs found in the text to anchors.
+ *	$("<div>Here are URLs: www.example1.com, www.example2.com</div>").jurlp();
+ *
+ *	// HTML becomes:
+ *	<div>
+ *		Here are URLs: 
+ *		<a href="http://www.example1.com/" class="jurlp-no-watch">www.example1.com</a>, 
+ *		<a href="http://www.example2.com/" class="jurlp-no-watch">www.example2.com</a>
+ *	</div>
+ *	(end code)
+ *
+ **/
+ 
+/**
+ *	Section: Parsing URL strings directly.
+ *
+ *	How to directly parse, modify or monitor an arbitrary URL string.
+ *
+ *	(start code)
+ *
+ *	// Get an interface for parsing the document URL...
+ *	var url = $.jurlp();
+ *
+ *	// .. or get an interface for parsing your own URL.
+ *	url = $.jurlp("www.example.com");
+ *
+ *	// Parse the URL to an object.
+ *	url.url();
+ *
+ *	// Get the URL scheme.
+ *	url.scheme();
+ *
+ *	// Get the URL host.
+ *	url.host();
+ *
+ *	// Get the URL port.
+ *	url.port();
+ *
+ *	// Get the URL path.
+ *	url.path();
+ *
+ *	// Get the URL query.
+ *	url.query();
+ *
+ *	// Get a specific parameter value from the URL query.
+ *	url.query().parameter;
+ *
+ *	// Get the URL fragment.
+ *	url.fragment();
+ *
+ *	// Create a watch for new URLs that contain "example.com" in the host name
+ *	var watch = $.jurlp("example.com").watch(function(element, selector){
+ *		console.log("Found example.com URL!", element, selector);
+ *	});
+ *
+ *	// We can even apply filters to the watch to be sure!
+ *	watch.jurlp("filter", "host", "*=", "example.com");
+ *
+ *	// Append a new URL, which will trigger the watch
+ *	$("body").append("<a href=\"www.example.com\"></a>");
+ *
+ *	// Stop watching for "example.com" URLs.
+ *	watch.jurlp("unwatch");
+ *
+ *	(end code)
+ *
+ */
+ 
+/**
  *	Section: Operators.
  *
  *	Overview of filter operators.
@@ -170,6 +338,17 @@
  *	"^=" - Starts with.
  *	"$=" - Ends with.
  *	"regex" - Regular expression.
+ *
+ **/
+
+ /**
+ *	Section: this parameter.
+ *
+ *	Where "this" is refered to as an argument to the method functions, it may be one of the following;
+ *
+ *	- HTML document element.
+ *	- An array of 1 or more elements with a "href" or "src" attribute.
+ *	- A URL parser interface returned from $.jurlp().
  *
  **/
 
@@ -210,7 +389,7 @@
 		 *
 		 *	Parameters: 
 		 * 
-		 *	this - The element to initialise.
+		 *	this - The element to initialise. See <this parameter>.
 		 *
 		 **/ 
 
@@ -234,9 +413,15 @@
 				}
 				else if ( this.is ( "[href]" ) )
 				{
-					/* Use the element href */ 
+					/* Use the element href attribute */ 
 
 					href = this.attr ( "href" );
+				}
+				else if ( this.is ( "[src]" ) )
+				{
+					/* Use the element src attribute */ 
+
+					href = this.attr ( "src" );
 				}
 
 				/* Check the href is not empty so we don't initialise the "data-href" attribute on text elements (although maybe this is not wanted, as an empty href is technically the current page?). */ 
@@ -270,7 +455,7 @@
 		{
 			/* Is the current element not the document, and also does not contain a "href" attribute */ 
 
-			if ( this.get ( 0 ) != $( document ).get ( 0 ) && this.attr ( "href" ) == null )
+			if ( this.get ( 0 ) != $( document ).get ( 0 ) && this.attr ( "href" ) == null && this.attr ( "src" ) == null )
 			{
 				/* Does the element contain anything? */ 
 
@@ -311,7 +496,7 @@
 					{
 						/* Replace the unique ID with an anchor tag */ 
 
-						html = html.replace ( "$" + i, "<a href=\"[url]\" data-jurlp-no-watch>[url]</a>".replace ( /\[url\]/g, urls [ i ] ) );
+						html = html.replace ( "$" + i, "<a href=\"[url]\" class=\"jurlp-no-watch\">[url]</a>".replace ( /\[url\]/g, urls [ i ] ) );
 					}
 
 					/* Did we change the HTML at all? */ 
@@ -361,9 +546,78 @@
 
 		/**
 		 *
+		 *	Function: setAttrUrl
+		 *
+		 *	Given an element, and an attribute, set the attribute to the supplied URL, and created a backup of the original URL if not already done.
+		 *
+		 *	Note, if the attribute doesn't exist, then it will not be created.
+		 *
+		 *	Parameters: 
+		 * 
+		 *	this - The element to set the attribute URL on.
+		 *
+		 *	attr - The name of the attribute to set.
+		 *
+		 *	url - The value of the attributes URL.
+		 *
+		 **/ 
+
+		var setAttrUrl = function ( attr, url )
+		{
+			/* Is the attribute present on this element? */ 
+
+			if ( this.is ( "[" + attr + "]" ) != false )
+			{
+				/* Has a copy of the original attribute been stored? */ 
+
+				if ( this.data ( "original-" + attr ) == null )
+				{
+					/* Store a copy of the original attribute */ 
+
+					this.data ( "original-" + attr, this.attr ( attr ) );
+				}
+
+				/* Update the elements attribute */ 
+
+				this.attr ( attr, url );
+			}
+		};
+
+		/**
+		 *
+		 *	Function: restoreAttrUrl
+		 *
+		 *	Given an element, and an attribute, then restore the URL attribute value to its original value.
+		 *
+		 *	Parameters: 
+		 * 
+		 *	this - The element to restore the attribute URL on.
+		 *
+		 *	attr - The name of the attribute to restore.
+		 *
+		 **/ 
+
+		var restoreAttrUrl = function ( attr )
+		{
+			/* Was a backup of the original attribute URL made? */ 
+
+			if ( this.data ( "original-" + attr ) != null )
+			{
+				/* Restore the attribute URL */ 
+
+				this.attr ( attr, this.data ( "original-" + attr ) );
+
+				/* Remove the original URL */ 
+
+				this.removeData ( "original-" + attr );
+			}
+		};
+
+		/**
+		 *
 		 *	Function: restoreElement
 		 *
-		 *	Destroys any data associated with an element that has previously been initialised for use with the URL parser, and restores the elements href attribute (if any) to its original value.
+		 *	Destroys any data associated with an element that has previously been initialised for use with the URL parser, and restores the elements "href" or "src" attribute (if any) to its original value.
 		 *
 		 *	Parameters: 
 		 * 
@@ -377,18 +631,13 @@
 
 			this.removeData ( "href" );
 
-			/* Was a backup of the original href URL made? */ 
+			/* Restore the href attribute */ 
 
-			if ( this.data ( "original-href" ) != null )
-			{
-				/* Restore the href URL */ 
+			restoreAttrUrl.apply ( this, [ "href" ] );
 
-				this.attr ( "href", this.data ( "original-href" ) );
+			/* Restore the src attribute */ 
 
-				/* Remove the original URL */ 
-
-				this.removeData ( "original-href" );
-			}
+			restoreAttrUrl.apply ( this, [ "src" ] );
 
 			/* Remove any watch attributes */ 
 
@@ -404,7 +653,7 @@
 		 *
 		 *	Function: getHref
 		 *
-		 *	Get the href URL for the element.
+		 *	Get the href URL for the element. Prioritises internal objects href, over "data-href", over "href", over "src" attributes.
 		 *
 		 *	Parameters: 
 		 * 
@@ -414,7 +663,7 @@
 
 		var getHref = function ( )
 		{
-			return this.data ( "href" ) || this.attr ( "href" ) || "";
+			return this.href || this.data ( "href" ) || this.attr ( "href" ) || this.attr ( "src" ) || "";
 		};
 
 		/**
@@ -484,28 +733,30 @@
 
 			url = sanitiseUrl ( url );
 
-			/* Does the element contain a href attribute? */ 
-
-			if ( this.is ( "[href]" ) != false )
+			if ( this.href != null )
 			{
-				/* Has a copy of the original href been stored? */ 
+				this.href = url;
 
-				if ( this.data ( "original-href" ) == null )
-				{
-					/* Store a copy of the original href */ 
-
-					this.data ( "original-href", this.attr ( "href" ) );
-				}
-
-				/* Update the elements href */ 
-
-				this.attr ( "href", url );
+				return;
 			}
-			else if ( this.get ( 0 ) == $( document ).get ( 0 ) )
+
+			/* Is the current element the document? */ 
+
+			if ( this.get ( 0 ) == $( document ).get ( 0 ) )
 			{
 				/* Current element is the document. Save the href under a data attribute. */
 
 				this.data ( "href", url );
+			}
+			else
+			{
+				/* Update href URL (if present) */ 
+
+				setAttrUrl.apply ( this, [ "href", url ] );
+
+				/* Update src URL (if present) */ 
+
+				setAttrUrl.apply ( this, [ "src", url ] );
 			}
 		};
 
@@ -527,14 +778,30 @@
 
 		var urlToObject = function ( url )
 		{
+			/* Does the URL contain JavaScript, and not a valid URI? */
+
+			if ( url.substring ( 0, 11 ).toLowerCase ( ) == "javascript:" )
+			{
+				/* Return the script? */ 
+
+				return { };
+			}
+
+			/* Ensure a protocol is specified, otherwise the parser will assume that the supplied host is the path */ 
+
 			if ( url.indexOf ( "://" ) == -1 )
 			{
 				url = "http://" + url;
 			}
 
-			/* Construct a new anchor element based on the supplied URL */ 
+			/* Construct a new anchor element based on the supplied URL (let the browser do the parsing) */ 
 
-			var a = $( "<a href=\"" + url + "\"></a>" ).get ( 0 );
+			//$( "<a href=\"" + url + "\"></a>" ).get ( 0 );
+			var a = document.createElement ( "a" );
+
+			a.href = url;
+
+			/* Sanitise the protocol string */ 
 
 			var protocol = a.protocol;
 
@@ -543,12 +810,16 @@
 				protocol += "//";
 			}
 
+			/* Sanitise the path string */ 
+
 			var pathname = a.pathname;
 
 			if ( pathname [ 0 ] != "/" )
 			{
 				pathname = "/" + pathname;
 			}
+
+			/* Ensure the port value is a string */ 
 
 			var port = a.port + "";
 
@@ -1168,6 +1439,11 @@
 
 		var returnEachElement = function ( callback, parameters )
 		{
+			if ( this.href != null )
+			{
+				return callback.apply ( this, [ parameters ] );
+			}
+
 			/* Add this function and parameters to the watch selector callstack (if watched) */ 
 
 			addSelectorCallback ( this, callback, [ parameters ] );
@@ -1205,6 +1481,11 @@
 
 		var returnEachObject = function ( callback, parameters )
 		{
+			if ( this.href != null )
+			{
+				return callback.apply ( this, [ parameters ] );
+			}
+
 			var result = [ ];
 
 			/* Build and return an array of each elements callback results */ 
@@ -1306,7 +1587,7 @@
 			 *
 			 *	Function: getUrl
 			 *
-			 *	Return the elements URL (stored under its "data-href", and/or "href" attribute).
+			 *	Return the elements URL (stored under its "data-href", and/or "href"/"src" attribute).
 			 *
 			 **/ 
 
@@ -1319,7 +1600,7 @@
 			 *
 			 *	Function: setUrl
 			 *
-			 *	Set the elements URL (stored under it's "data-href", and/or "href" attribute). Note: This does not change document.location.href for the $(document) element!
+			 *	Set the elements URL (stored under it's "data-href", and/or "href"/"src" attribute). Note: This does not change document.location.href for the $(document) element!
 			 *
 			*/ 
 
@@ -1933,7 +2214,7 @@
 			 *
 			 *	Parameters:
 			 *
-			 *	this - Array of elements to modify. The elements may be either HTML anchor elements, or the HTML document element.
+			 *	this - See <this parameter>.
 			 *
 			 *	url - If present, specifies the new URL object/string to set. Otherwise the function will get the URL.
 			 *
@@ -1980,7 +2261,7 @@
 			 *
 			 *	Parameters:
 			 *
-			 *	this - Array of elements to modify. The elements may be either HTML anchor elements, or the HTML document element.
+			 *	this - See <this parameter>.
 			 *
 			 *	fragment - If present, specifies the new fragment string to set. Otherwise the function will get the fragment string from each elements URL.
 			 *
@@ -2024,7 +2305,7 @@
 			 *
 			 *	Parameters:
 			 *
-			 *	this - Array of elements to modify. The elements may be either HTML anchor elements, or the HTML document element.
+			 *	this - See <this parameter>.
 			 *
 			 *	query - If present, specifies the new query object to set. Otherwise the function will get the query object from each elements URL.
 			 *
@@ -2077,7 +2358,7 @@
 			 *
 			 *	Parameters:
 			 *
-			 *	this - Array of elements to modify. The elements may be either HTML anchor elements, or the HTML document element.
+			 *	this - See <this parameter>.
 			 *
 			 *	path - If present, specifies the new path to set. Otherwise the function will get the path object from each elements URL.
 			 *
@@ -2143,7 +2424,7 @@
 			 *
 			 *	Parameters:
 			 *
-			 *	this - Array of elements to modify. The elements may be either HTML anchor elements, or the HTML document element.
+			 *	this - See <this parameter>.
 			 *
 			 *	port - If present, specifies the new port to set. Otherwise the function will get the port string from each elements URL.
 			 *
@@ -2187,7 +2468,7 @@
 			 *
 			 *	Parameters:
 			 *
-			 *	this - Array of elements to modify. The elements may be either HTML anchor elements, or the HTML document element.
+			 *	this - See <this parameter>.
 			 *
 			 *	host - If present, specifies the new host name to set. Otherwise the function will get the host name string from each elements URL.
 			 *
@@ -2231,7 +2512,7 @@
 			 *
 			 *	Parameters:
 			 *
-			 *	this - Array of elements to modify. The elements may be either HTML anchor elements, or the HTML document element.
+			 *	this - See <this parameter>.
 			 *
 			 *	scheme - If present, specifies the new scheme. Otherwise the function will get the scheme string from each elements URL.
 			 *
@@ -2275,15 +2556,15 @@
 			 *	
 			 *	Elements are initialised as follows;
 			 *
-			 *	$(document) - Initialise the "data-href" attribute for the document with the value of "document.location.href". The "data-href" attribute will be modified instead of "document.location.href" when modifying this element. See <document.location.href>.
+			 *	$(document) - Initialise the "data-href" attribute for the document with the value of "document.location.href". The "data-href" attribute will be modified instead of "document.location.href" when modifying this element. See <Parsing document.location.href>.
 			 *
-			 *	$("a") - (Or any element with a "href" attribute). An attribute named "data-original-href" is created to store a copy of the elements original "href" attribute at the time of initialisation. See <a href>.
+			 *	Elements with "href"/"src" attributes - An attribute named "data-original-href" or "data-original-src" is created to store a copy of the elements original "href"/"src" attribute at the time of initialisation. See <Parsing elements with an “href” or “src” attribute>.
 			 *
 			 *	All other elements - Parses the element HTML for URLs, wraps any URLs found in an anchor tag, and returns all anchor elements.
 			 *
 			 *	Parameters:
 			 *
-			 *	this - Array of elements to initialise the parser interface on.
+			 *	this - See <this parameter>.
 			 *
 			 *	Returns:
 			 *	
@@ -2337,13 +2618,13 @@
 			 *
 			 *	$(document) - Removes the "data-href" attribute.
 			 *
-			 *	$("a") - (Or any element with a "href" attribute). Restores the "href" attribute to the "data-original-href" attribute value, and removes any other added attributes.
+			 *	Elements with "href"/"src" - Restores the "href"/"src" attribute to the "data-original-href/src" attribute value, and removes any other added attributes.
 			 *
 			 *	All other elements - Currently there is no way to restore an elements HTML which has been converted by the parser, so consider saving it first if needed!
 			 *
 			 *	Parameters:
 			 *
-			 *	this - Array of elements to restore. The elements may be either HTML anchor elements, or the HTML document element.
+			 *	this - See <this parameter>.
 			 *
 			 *	Returns:
 			 *
@@ -2372,11 +2653,11 @@
 			 *
 			 *	Function: goto
 			 *
-			 *	Set document.location.href to the supplied elements "href" or "data-href" attribute value.
+			 *	Set document.location.href to the supplied elements "href", "src" or "data-href" attribute value.
 			 *
 			 *	Parameters:
 			 *
-			 *	this - HTML anchor element or HTML document element containing a "href" or "data-href" attribute.
+			 *	this - See <this parameter>.
 			 *
 			 *	Examples:
 			 *
@@ -2402,7 +2683,7 @@
 			 *
 			 *	Parameters:
 			 *
-			 *	this - Array of elements to modify. The elements may be either HTML anchor elements, or the HTML document element.
+			 *	this - See <this parameter>.
 			 *
 			 *	url - The proxy URL.
 			 *
@@ -2452,7 +2733,7 @@
 			 *
 			 *	Parameters:
 			 *
-			 *	this - Array of elements to obtain the selector from.
+			 *	this - Array of elements to obtain the selector from. See <this parameter>.
 			 *
 			 *	callback - Function to call when elements are found, which is supplied two arguments, the new element that was inserted into the DOM, and the selector that triggered the watch.
 			 *
@@ -2565,9 +2846,9 @@
 								target = $( event.target ).find ( selector );
 							}
 
-							/* Ensure we have a target to modify, and that we are allowed to watch it (the "data-jurlp-no-watch" attribute is set on elements created in initialiseElementText()). */ 
+							/* Ensure we have a target to modify, and that we are allowed to watch it (the ".jurlp-no-watch" class is present on elements created in initialiseElementText()). */ 
 
-							if ( target.length > 0 && target.is ( "data-jurlp-no-watch" ) == false )
+							if ( target.length > 0 && target.is ( ".jurlp-no-watch" ) == false )
 							{
 								var filtered = false;
 
@@ -2652,7 +2933,7 @@
 			 *
 			 *	Parameters:
 			 *
-			 *	this - Array of elements to filter.
+			 *	this - Array of elements to filter. See <this parameter>.
 			 *
 			 *	segment - The URL segment to filter on (either "scheme", "host", "port", "path", "query" or "fragment"), or "url" to filter on the full URL. See <URL overview> for more information.
 			 *
@@ -2793,7 +3074,7 @@
 		 *
 		 *	Parameters:
 		 *
-		 *	this - Element(s) to process.
+		 *	this - Element(s) to process. See <this parameter>.
 		 *
 		 *	method - See <Public interface> for an overview of available methods and arguments.
 		 *
@@ -2823,6 +3104,78 @@
 			/* Dispatch to the relevant method */ 
 
 			return methodDispatcher.apply ( this, arguments );
+		};
+
+		/**
+		 *
+		 *
+		 *	Function: $.jurlp
+		 *
+		 *	Returns an interface for directly parsing, manipulating and monitoring the supplied URL.
+		 *
+		 *	Parameters:
+		 *
+		 *	url - The URL string to provide a URL parser interface for. Defaults to document.location.href if no URL is supplied.
+		 *
+		 *	Returns:
+		 *
+		 *	The URL parser interface for the given URL.
+		 *
+		 *	Members:
+		 *
+		 *	href - The URL string.
+		 *
+		 *	Methods:
+		 *
+		 *	url - See <url>.
+		 *
+		 *	scheme - See <scheme>.
+		 *
+		 *	host - See <host>.
+		 *
+		 *	port - See <port>.
+		 *
+		 *	path - See <path>.
+		 *
+		 *	query - See <query>.
+		 *
+		 *	fragment - See <fragment>.
+		 *
+		 *	goto - See <goto>.
+		 *
+		 *	watch - Sets a watch for all "href" and "src" attributes containing the URLs hostname (selector is "[href*="host"],[src*="host"]" where host is this.host() ), and returns all elements of the same selector for chaining purposes. See <watch> for more information.
+		 *
+		 *	Examples:
+		 *
+		 *	See <Parsing URL strings directly>.
+		 *
+		 **/
+
+		$.jurlp = function ( url )
+		{
+			/* Create an object for manipulating the url, or document.location.href if null. */ 
+
+			return {
+				href : url || document.location.href,
+				url : methods.url,
+				scheme : methods.scheme,
+				host : methods.host,
+				port : methods.port,
+				path : methods.path,
+				query : methods.query,
+				fragment : methods.fragment,
+				"goto" : methods [ "goto" ],
+				watch : function ( callback )
+				{
+					/* Get the current host name */ 
+
+					var host = this.host ( );
+
+					/* Set a watch on the href or src selectors */ 
+
+					return $( "[href*=\"" + host + "\"],[src*=\"" + host + "\"]" ).jurlp ( "watch", callback );
+				}
+			};
 		};
 	}
 ) ( jQuery );
