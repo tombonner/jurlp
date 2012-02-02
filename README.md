@@ -36,7 +36,7 @@ Files
     |-jurlp.js ........ JQuery URL parser plugin source.
     |-jurlp.min.js .... jurlp.js compressed using YUI Compressor.
     |-jurlp.html ...... JQuery URL parser plugin QUnit test suite.
-    |-README.me ....... This file.
+    |-README.md ....... This file.
     |-doc/ ............ Natural Docs output.
     |-doc/index.html .. Documentation main-page.
 
