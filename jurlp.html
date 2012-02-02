@@ -214,7 +214,7 @@
 
 					var getHref = function ( )
 					{
-						return this.attr ( "href" ) || document.location.href;
+						return this.attr ( "href" ) || this.attr ( "src" ) || document.location.href;
 					};
 
 					/* Provide a test function to get/set/parse a URL for a given element */ 
@@ -644,6 +644,8 @@
 			<a id="url14" class="segment-test" href="http://www.example.com/?param1=value1&param2=value2&param3=value3#fragment"></a>
 			<a id="url15" class="segment-test" href="http://www.example.com/?param1=value1&param2=value2&param3=value3"></a>
 
+			<img id="img1" class="segment-test" src="http://www.example.com/folder/file.img" />
+
 			<!-- URL for testing filtering -->
 
 			<a id="url16" class="filter-test" href="http://www.example.com:8080/path/file.name?param1=value1&param2=value2&param3=value3#fragment"></a>
@@ -675,20 +677,20 @@
 			<div class="text-test-result">
 				This is text within a div.
 				<p>
-					Here is a paragraph of text. It also contains a link to <a href="http://www.example.com/" data-jurlp-no-watch="">www.example.com</a>.
+					Here is a paragraph of text. It also contains a link to <a href="http://www.example.com/" class="jurlp-no-watch">www.example.com</a>.
 				</p>
-				This is more text within the div, with a link to <a href="http://www.example2.com/" data-jurlp-no-watch="">www.example2.com</a>.
+				This is more text within the div, with a link to <a href="http://www.example2.com/" class="jurlp-no-watch">www.example2.com</a>.
 				<p>
-					<a href="http://www.example.com/" data-jurlp-no-watch="">http://www.example.com/</a>
-					<a href="http://www.example.com:8080/" data-jurlp-no-watch="">http://www.example.com:8080/</a>
-					<a href="http://www.example.com:8080/path/file.name" data-jurlp-no-watch="">http://www.example.com:8080/path/file.name</a>
-					<a href="http://www.example.com:8080/path/file.name?param1=value1&amp;param2=value2&amp;param3=value3" data-jurlp-no-watch="">http://www.example.com:8080/path/file.name?param1=value1&amp;param2=value2&amp;param3=value3</a>
-					<a href="http://www.example.com:8080/path/file.name?param1=value1&amp;param2=value2&amp;param3=value3#fragment" data-jurlp-no-watch="">http://www.example.com:8080/path/file.name?param1=value1&amp;param2=value2&amp;param3=value3#fragment</a>
-					<a href="http://www.example.com:8080/path/file.name#fragment" data-jurlp-no-watch="">http://www.example.com:8080/path/file.name#fragment</a>
-					<a href="http://www.example.com:8080/?param1=value1&amp;param2=value2&amp;param3=value3#fragment" data-jurlp-no-watch="">http://www.example.com:8080/?param1=value1&amp;param2=value2&amp;param3=value3#fragment</a>
-					<a href="http://www.example.com:8080/?param1=value1&amp;param2=value2&amp;param3=value3" data-jurlp-no-watch="">http://www.example.com:8080/?param1=value1&amp;param2=value2&amp;param3=value3</a>
+					<a href="http://www.example.com/" class="jurlp-no-watch">http://www.example.com/</a>
+					<a href="http://www.example.com:8080/" class="jurlp-no-watch">http://www.example.com:8080/</a>
+					<a href="http://www.example.com:8080/path/file.name" class="jurlp-no-watch">http://www.example.com:8080/path/file.name</a>
+					<a href="http://www.example.com:8080/path/file.name?param1=value1&amp;param2=value2&amp;param3=value3" class="jurlp-no-watch">http://www.example.com:8080/path/file.name?param1=value1&amp;param2=value2&amp;param3=value3</a>
+					<a href="http://www.example.com:8080/path/file.name?param1=value1&amp;param2=value2&amp;param3=value3#fragment" class="jurlp-no-watch">http://www.example.com:8080/path/file.name?param1=value1&amp;param2=value2&amp;param3=value3#fragment</a>
+					<a href="http://www.example.com:8080/path/file.name#fragment" class="jurlp-no-watch">http://www.example.com:8080/path/file.name#fragment</a>
+					<a href="http://www.example.com:8080/?param1=value1&amp;param2=value2&amp;param3=value3#fragment" class="jurlp-no-watch">http://www.example.com:8080/?param1=value1&amp;param2=value2&amp;param3=value3#fragment</a>
+					<a href="http://www.example.com:8080/?param1=value1&amp;param2=value2&amp;param3=value3" class="jurlp-no-watch">http://www.example.com:8080/?param1=value1&amp;param2=value2&amp;param3=value3</a>
 				</p>
-				And a final URL <a href="http://www.example.com:8080/path/file.name?param1=value1&amp;param2=value2&amp;param3=value3#fragment" data-jurlp-no-watch="">http://www.example.com:8080/path/file.name?param1=value1&amp;param2=value2&amp;param3=value3#fragment</a> on the end.
+				And a final URL <a href="http://www.example.com:8080/path/file.name?param1=value1&amp;param2=value2&amp;param3=value3#fragment" class="jurlp-no-watch">http://www.example.com:8080/path/file.name?param1=value1&amp;param2=value2&amp;param3=value3#fragment</a> on the end.
 			</div>
 		</div>
 	</body>
