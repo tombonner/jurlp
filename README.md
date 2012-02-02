@@ -22,12 +22,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Documentation
 -------------
 
-To browse the full version of the documentation see http://tombonner.github.com/jurlp/doc.1.0.2/index.html
+View the full [HTML documentation](http://tombonner.github.com/jurlp/doc.1.0.2/index.html)
 
 Unit test
 ---------
 
-To view/run the unit test for the parser interface see http://tombonner.github.com/jurlp/jurlp.html
+Run the [QUnit test suite](http://tombonner.github.com/jurlp/jurlp.html)
 
 Files
 -----
