@@ -5,7 +5,7 @@ JQuery URL parser plugin for parsing, manipulating, filtering and monitoring URL
 
 **Version**
 
-1.0.2
+1.0.3
 
 **License**
 
@@ -22,12 +22,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Documentation
 -------------
 
-View the full [HTML documentation](http://tombonner.github.com/jurlp/doc.1.0.2/index.html)
+View the full [HTML documentation](http://tombonner.github.com/jurlp/doc.1.0.2/index.html).
 
 Unit test
 ---------
 
-Run the [QUnit test suite](http://tombonner.github.com/jurlp/jurlp.html)
+Run the [QUnit test suite](http://tombonner.github.com/jurlp/jurlp.html).
 
 Files
 -----
@@ -52,15 +52,17 @@ A quick quide to URL nomenclature in this plugin.
 
 Throughout this plugin, URLs are segmented and refered to in the following manner;
 
-    http://www.example.com:8080/path/file.name?query=string#anchor
-    |_____||_____________||___||_____________||___________||_____|
-       |         |          |         |             |         |
-    scheme      host       port      path         query   fragment
-    |____________________________________________________________|
-                                  |
-                                 url
+    http://username:password@www.example.com:443/path/file.name?query=string#anchor
+    |_____||______| |______| |_____________| |_||_____________||___________||_____|
+       |       |       |           |          |         |             |         |
+    scheme   user   password      host       port      path         query   fragment
+    |______________________________________________________________________________|
+                                           |
+                                          url
 
 * **Scheme** - Contains the protocol identifier (i.e.  "https://", "ftp://").
+* **User** - Conains the username to use when connecting to the host server. This segment may be empty.
+* **Password** - Contains the password to use in conjunction with the username when connecting to the remote server. This segment may be empty (and cannot be set without a user name).
 * **Host** - Contains the name or IP address of the host server (i.e.  "www.example.com", or "127.0.0.1").
 * **Port** - Contains the listening port number for the host server (i.e.  "80", or "8080").  Note that an empty port value implies the default port (80).
 * **Path** - Contains the file path (i.e.  "/index.html", or "/").

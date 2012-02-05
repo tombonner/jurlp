@@ -14,7 +14,7 @@
  *
  *	About: Version
  *
- *	1.0.2
+ *	1.0.3
  *
  *	About: License
  *
@@ -39,19 +39,25 @@
  *
  *	Throughout this plugin, URLs are segmented and refered to in the following manner;
  *
- *
- *	> http://www.example.com:8080/path/file.name?query=string#anchor
- *	> |_____||_____________||___||_____________||___________||_____|
- *	>    |         |          |         |             |         |
- *	> scheme      host       port      path         query   fragment
- *	> |____________________________________________________________|
- *	>                               |
- *  >                              url
- *
+ *	> http://username:password@www.example.com:443/path/file.name?query=string#anchor
+ *	> |_____||______| |______| |_____________| |_||_____________||___________||_____|
+ *	>    |       |       |           |          |         |             |         |
+ *	> scheme   user   password      host       port      path         query   fragment
+ *	> |______________________________________________________________________________|
+ *	>                                        |
+ *  >                                       url
  *
  *	Scheme:
  *
  *	Contains the protocol identifier (i.e. "https://", "ftp://").
+ *
+ *	User:
+ *
+ *	Conains the username to use when connecting to the host server. This segment may be empty.
+ *
+ *	Password:
+ *
+ *	Contains the password to use in conjunction with the username when connecting to the remote server. This segment may be empty (and cannot be set without a user name).
  *
  *	Host:
  *
@@ -83,10 +89,12 @@
  *
  *	{
  *		scheme: "http://"
- *		host: "www.example.com"
- *		port: "8080" // Note the missing leading colon!
- *		path: "/path/file.name"
- *		query: "?query=string"
+ *		user: "username",
+ *		password: "password",
+ *		host: "www.example.com",
+ *		port: "8080",
+ *		path: "/path/file.name",
+ *		query: "?query=string",
  *		fragment: "#anchor"
  *	}
  *
@@ -111,7 +119,7 @@
  *
  *	Section: Quick overview
  *
- *	Useful code.
+ *	Useful example code.
  *
  *	(start code)
  *
@@ -158,14 +166,20 @@
  *	// Parse an element's text for URLs and create/return anchor elements
  *	$("<div>www.example.com</div>").jurlp();
  *
- *	// Get an interface for parsing the URL
- *	url = $.jurlp("www.example.com");
+ *	// Get an interface for parsing/manipulating the supplied URL
+ *	url = $.jurlp("http://www.example.com:80/path/file.name?param1=value1#fragment");
  *
  *	// Parse the URL to an object.
  *	url.url();
  *
  *	// Get the URL scheme.
  *	url.scheme();
+ *
+ *	// Get the URL user name.
+ *	url.user();
+ *
+ *	// Get the URL password.
+ *	url.password();
  *
  *	// Get the URL host.
  *	url.host();
@@ -180,10 +194,51 @@
  *	url.query();
  *
  *	// Get a specific parameter value from the URL query.
- *	url.query().parameter;
+ *	url.query().param1;
  *
  *	// Get the URL fragment.
  *	url.fragment();
+ *
+ *	// Set the full URL.
+ *	url.url("http://www.example.com:80/path/file.name?param1=value1#fragment");
+ *
+ *	// Set the URL scheme.
+ *	url.scheme("https://");
+ *
+ *	// Set the URL user name.
+ *	url.user("user");
+ *
+ *	// Set the URL password.
+ *	url.password("password");
+ *
+ *	// Set the URL host.
+ *	url.host("www.newexample.com");
+ *
+ *	// Set the URL port.
+ *	url.port("80");
+ *
+ *	// Set the URL path.
+ *	url.path("/newpath/newfile.file");
+ *
+ *	// Append to the URL path.
+ *	url.path("./newfile.file");
+ *
+ *	// Remove two path elements and append to the URL path.
+ *	url.path("../../newfile.file");
+ *
+ *	// Set the URL query.
+ *	url.query("?param=value");
+ *
+ *	// Append/modify the URL query (string or object)
+ *	url.query("param=value");
+ *	url.query({"param":"value"});
+ *
+ *	// Remove the URL query
+ *	url.query("");
+ *	url.query({});
+ *
+ *	// Set the URL fragment.
+ *	url.fragment("#newfragment");
  *
  *	(end code)
  *
@@ -355,6 +410,18 @@
 (
 	function ( $ )
 	{
+		/**
+		 *
+		 *	Regular expression for parsing URLs.
+		 *
+		 *	Taken from parseUri 1.2 (http://blog.stevenlevithan.com/archives/parseuri).
+		 *
+		 *	http://blog.stevenlevithan.com/archives/parseuri
+		 *
+		 **/ 
+
+		var urlRegEx = /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/;
+
 		/*
 
 			Global object of watched selectors and their array of callstacks.
@@ -764,7 +831,7 @@
 		 *
 		 *	Function: urlToObject
 		 *
-		 *	Parse a URL into segments using the DOM. Here is the place to replace URL parsing, if you want to!
+		 *	Parse a URL into segments using the DOM. Parses authority information from the URL using parseUri (http://blog.stevenlevithan.com/archives/parseuri).
 		 *
 		 *	Parameters: 
 		 *
@@ -778,25 +845,49 @@
 
 		var urlToObject = function ( url )
 		{
+			var credentials = { user : "", password : "" };
+
 			/* Does the URL contain JavaScript, and not a valid URI? */
 
 			if ( url.substring ( 0, 11 ).toLowerCase ( ) == "javascript:" )
 			{
-				/* Return the script? */ 
+				/* Return the document URL, and extend the URL object with the script (dirty hack) */ 
 
-				return { };
+				return $.extend ( urlToObject ( document.location.href ), { script : url.substring ( 11 ) } );
 			}
 
-			/* Ensure a protocol is specified, otherwise the parser will assume that the supplied host is the path */ 
+			/* If a URL is supplied, ensure a protocol is specified, otherwise the parser will assume that the supplied host is the path */ 
 
-			if ( url.indexOf ( "://" ) == -1 )
+			if ( url != "" && url.indexOf ( "://" ) == -1 )
 			{
 				url = "http://" + url;
 			}
 
+			/* Does the URL contain authority information? */ 
+
+			if ( url.indexOf ( "@" ) != -1 )
+			{
+				/* Parse the URL using regex */ 
+
+				var urlSegments = url.match ( urlRegEx );
+
+				/* Was a username found? */ 
+
+				if ( urlSegments [ 4 ] )
+				{
+					credentials.user = urlSegments [ 4 ];
+				}
+
+				/* Was a password found? */ 
+
+				if ( urlSegments [ 5 ] )
+				{
+					credentials.password = urlSegments [ 5 ];
+				}
+			}
+
 			/* Construct a new anchor element based on the supplied URL (let the browser do the parsing) */ 
 
-			//$( "<a href=\"" + url + "\"></a>" ).get ( 0 );
 			var a = document.createElement ( "a" );
 
 			a.href = url;
@@ -832,7 +923,7 @@
 
 			/* Return the URL object, based on the URL information for the newly created anchor element contained in the DOM */ 
 
-			return { scheme : protocol, host : a.hostname, port : port, path : pathname, query : a.search, fragment : a.hash };
+			return { scheme : protocol, user : credentials.user, password : credentials.password, host : a.hostname, port : port, path : pathname, query : a.search, fragment : a.hash };
 		};
 
 		/**
@@ -853,9 +944,33 @@
 
 		var objectToUrl = function ( url )
 		{
-			/* Glue the URL together (only including the port if explicitly specified) */ 
+			/* Build URL string, starting with the scheme */ 
 
-			return url.scheme + url.host + ( url.port != "" ? ":" + url.port : "" ) + url.path + url.query + url.fragment;;
+			var urlString = url.scheme;
+
+			/* Was a username specified? */ 
+
+			if ( url.user != null && url.user != "" )
+			{
+				/* Insert the username */ 
+
+				urlString += url.user;
+
+				/* Was a password also specified? */ 
+
+				if ( url.password != null && url.password != "" )
+				{
+					urlString += ":" + url.password;
+				}
+
+				/* Insert authority/host seperator */ 
+
+				urlString += "@";
+			}
+
+			/* Glue the remainder of the URL together (only including the port if explicitly specified) */ 
+
+			return urlString + url.host + ( url.port != "" ? ":" + url.port : "" ) + url.path + url.query + url.fragment;
 		};
 
 		/**
@@ -1040,20 +1155,103 @@
 
 		var updateQuery = function ( query )
 		{
-			var queryString = query;
+			var queryObject = { };
 
-			/* Was a non empty object supplied? */ 
+			/* Get the query object for the current URL */ 
 
-			if ( typeof query == "object" )
+			var currentQueryObject = getQueryObject ( getHref.apply ( this ) );
+
+			/* Was a string supplied as the parameter? */ 
+
+			if ( typeof query == "string" )
 			{
-				/* Use the query object toString() method to convert it to a string */ 
+				/* If the first character is a "?", then replace the whole query string */ 
 
-				queryString = queryObjectToString.apply ( query );
+				if ( query [ 0 ] == "?" )
+				{
+					/* Trash the existing query object */ 
+
+					currentQueryObject = { };
+
+					/* Strip the leading question mark */ 
+
+					query = query.substring ( 1 );
+				}
+
+				/* Convert the supplied query string to an object */ 
+
+				queryObject = queryStringToObject ( query );
+			}
+			else
+			{
+				queryObject = query;
 			}
 
-			/* Update the query string */ 
+			/* Did the supplied query object contain parameters? */ 
 
-			updateHref.apply ( this, [ "query", queryString ] );
+			if ( $.isEmptyObject ( queryObject ) == false )
+			{
+				/* Extend the existing query object with the new query object */ 
+
+				queryObject = $.extend ( currentQueryObject, queryObject );
+			}
+			else
+			{
+				/* An empty query object was supplied, so null the query string */ 
+
+				currentQueryObject = { };
+			}
+
+			/* Convert the query object to a string, and update the URL query string */ 
+
+			updateHref.apply ( this, [ "query", queryObjectToString.apply ( queryObject ) ] );
+		};
+
+		/**
+		 *
+		 *	Function: queryStringToObject
+		 *
+		 *	Convert a query string to an object.
+		 *
+		 *	Parameters: 
+		 *
+		 *	query - Query string to convert to an object.
+		 *
+		 *	Returns:
+		 *
+		 *	The query object.
+		 *
+		 **/ 
+
+		var queryStringToObject = function ( query )
+		{
+			var object = { };
+
+			/* Was a query string supplied? */ 
+
+			if ( query != "" )
+			{
+				/* Get all elements of the query string ("&name=value") */ 
+
+				var elements = query.split ( "&" );
+
+				/* Create the query object */ 
+
+				for ( var i = 0; i < elements.length; i++ )
+				{
+					/* Retrieve the parameter name and value from the string "name=value" */ 
+
+					var parameter = elements [ i ].split ( "=" );
+
+					/* Add the parameter to the query object */ 
+
+					object [ parameter [ 0 ] ] = parameter [ 1 ];
+				}
+			}
+
+			/* Return the query object */ 
+
+			return object;
 		};
 
 		/**
@@ -1074,39 +1272,9 @@
 
 		var getQueryObject = function ( url )
 		{
-			/* Get the query string from the URL */ 
+			/* Get the query string from the URL and convert it to an object */ 
 
-			var queryString = getQueryString ( url );
-
-			/* Anything? */ 
-
-			if ( queryString != "" )
-			{
-				var queryObject = { };
-
-				/* Get all elements of the query string ("&name=value") */ 
-
-				var queryElements = queryString.split ( "&" );
-
-				/* Create the query object */ 
-
-				for ( var i = 0; i < queryElements.length; i++ )
-				{
-					/* Retrieve the parameter name and value from the string "name=value" */ 
-
-					var parameter = queryElements [ i ].split ( "=" );
-
-					/* Add the parameter to the query object */ 
-
-					queryObject [ parameter [ 0 ] ] = parameter [ 1 ];
-				}
-
-				return queryObject;
-			}
-
-			/* No query string found */ 
-
-			return { };
+			return queryStringToObject ( getQueryString ( url ) );
 		};
 
 		/**
@@ -1377,6 +1545,48 @@
 
 		/**
 		 *
+		 *	Function: getPasswordString
+		 *
+		 *	Retrieve the password string for a given URL.
+		 *
+		 *	Parameters: 
+		 *
+		 *	url - URL string or object.
+		 *
+		 *	Returns:
+		 *
+		 *	The password string.
+		 *
+		 **/ 
+
+		var getPasswordString = function ( url )
+		{
+			return getUrlObject ( url ).password;
+		};
+
+		/**
+		 *
+		 *	Function: getUserString
+		 *
+		 *	Retrieve the user string for a given URL.
+		 *
+		 *	Parameters: 
+		 *
+		 *	url - URL string or object.
+		 *
+		 *	Returns:
+		 *
+		 *	The user string.
+		 *
+		 **/ 
+
+		var getUserString = function ( url )
+		{
+			return getUrlObject ( url ).user;
+		};
+
+		/**
+		 *
 		 *	Function: getSchemeString
 		 *
 		 *	Retrieve the scheme string for a given URL.
@@ -1439,9 +1649,17 @@
 
 		var returnEachElement = function ( callback, parameters )
 		{
+			/* Is this an object, containing an href member? */ 
+
 			if ( this.href != null )
 			{
-				return callback.apply ( this, [ parameters ] );
+				/* Issue the callback */ 
+
+				callback.apply ( this, [ parameters ] );
+
+				/* Return the object (for chaining purposes) */ 
+
+				return this;
 			}
 
 			/* Add this function and parameters to the watch selector callstack (if watched) */ 
@@ -1845,6 +2063,94 @@
 			"setHost" : function ( host )
 			{
 				return returnEachElement.apply ( this, [ updateHrefShim, [ "host", host ] ] );
+			},
+
+			/**
+			 *
+			 *	Function: getPassword
+			 *
+			 *	Get the password string from the elements URL.
+			 *
+			 *	Parameters: 
+			 *
+			 *	this - The element to retrieve the password string from.
+			 *
+			 *	Returns: 
+			 *
+			 *	The password string.
+			 *
+			 **/ 
+
+			"getPassword" : function ( )
+			{
+				return returnEachObject.apply ( this, [ function ( ) { return getPasswordString ( getHref.apply ( this ) ); }, null ] );
+			},
+
+			/**
+			 *
+			 *	Function: setPassword
+			 *
+			 *	Set the password string for the elements URL.
+			 *
+			 *	Parameters: 
+			 *
+			 *	this - The element to set the password string on.
+			 *
+			 *	password - The new password string.
+			 *
+			 *	Returns: 
+			 *
+			 *	Array of elements that were changed.
+			 *
+			 **/ 
+
+			"setPassword" : function ( password )
+			{
+				return returnEachElement.apply ( this, [ updateHrefShim, [ "password", password ] ] );
+			},
+
+			/**
+			 *
+			 *	Function: getUser
+			 *
+			 *	Get the user string from the elements URL.
+			 *
+			 *	Parameters: 
+			 *
+			 *	this - The element to retrieve the user string from.
+			 *
+			 *	Returns: 
+			 *
+			 *	The user string.
+			 *
+			 **/ 
+
+			"getUser" : function ( )
+			{
+				return returnEachObject.apply ( this, [ function ( ) { return getUserString ( getHref.apply ( this ) ); }, null ] );
+			},
+
+			/**
+			 *
+			 *	Function: setUser
+			 *
+			 *	Set the user string for the elements URL.
+			 *
+			 *	Parameters: 
+			 *
+			 *	this - The element to set the user string on.
+			 *
+			 *	user - The new user string.
+			 *
+			 *	Returns: 
+			 *
+			 *	Array of elements that were changed.
+			 *
+			 **/ 
+
+			"setUser" : function ( user )
+			{
+				return returnEachElement.apply ( this, [ updateHrefShim, [ "user", user ] ] );
 			},
 
 			/**
@@ -2506,6 +2812,78 @@
 
 			/**
 			 *
+			 *	Function: password
+			 *
+			 *	Get/Set the password segment of the URL for the given element(s).
+			 *
+			 *	Note! A password cannot be set on a URL unless a user name has been set first (see <user>).
+			 *
+			 *	Parameters:
+			 *
+			 *	this - See <this parameter>.
+			 *
+			 *	password - If present, specifies the new password to set. Otherwise the function will get the password string from each elements URL.
+			 *
+			 *	Returns:
+			 *
+			 *	If a password was specified, then this function returns the array of modified elements for chaining purposes, otherwise it returns an array of password strings from each elements URL.
+			 *
+			 *	Examples:
+			 *
+			 *	(start code)
+			 *
+			 *	// Parse all URLs in anchor tags and retrieve their password
+			 *	$("a").jurlp("password");
+			 *
+			 *	// Replace the password in all anchor tags with the new password string
+			 *	$("a").jurlp("password", "newpassword");
+			 *
+			 *	(end code)
+			 *
+			 **/
+
+			"password" : function ( password )
+			{
+				return dispatchGetSetHelper.apply ( this, [ helpers.getPassword, helpers.setPassword, arguments ] );
+			},
+
+			/**
+			 *
+			 *	Function: user
+			 *
+			 *	Get/Set the user segment of the URL for the given element(s).
+			 *
+			 *	Parameters:
+			 *
+			 *	this - See <this parameter>.
+			 *
+			 *	user - If present, specifies the new username to set. Otherwise the function will get the username string from each elements URL.
+			 *
+			 *	Returns:
+			 *
+			 *	If a username was specified, then this function returns the array of modified elements for chaining purposes, otherwise it returns an array of username strings from each elements URL.
+			 *
+			 *	Examples:
+			 *
+			 *	(start code)
+			 *
+			 *	// Parse all URLs in anchor tags and retrieve their username
+			 *	$("a").jurlp("user");
+			 *
+			 *	// Replace the username in all anchor tags with the new username string
+			 *	$("a").jurlp("username", "newusername");
+			 *
+			 *	(end code)
+			 *
+			 **/
+
+			"user" : function ( user )
+			{
+				return dispatchGetSetHelper.apply ( this, [ helpers.getUser, helpers.setUser, arguments ] );
+			},
+
+			/**
+			 *
 			 *	Function: scheme
 			 *
 			 *	Get/Set the scheme segment of the URL for the given element(s).
@@ -3131,6 +3509,10 @@
 		 *
 		 *	scheme - See <scheme>.
 		 *
+		 *	user - See <user>.
+		 *
+		 *	password - See <password>.
+		 *
 		 *	host - See <host>.
 		 *
 		 *	port - See <port>.
@@ -3141,9 +3523,13 @@
 		 *
 		 *	fragment - See <fragment>.
 		 *
+		 *	proxy - See <proxy>.
+		 *
 		 *	goto - See <goto>.
 		 *
-		 *	watch - Sets a watch for all "href" and "src" attributes containing the URLs hostname (selector is "[href*="host"],[src*="host"]" where host is this.host() ), and returns all elements of the same selector for chaining purposes. See <watch> for more information.
+		 *	watch - Sets a watch for all "href" and "src" attributes containing the URLs hostname (selector is "[href*="host"],[src*="host"]" where host is this.host()), and returns all elements of the same selector for chaining purposes. See <watch> for more information.
+		 *
+		 *	unwatch - Removes a watch created for the current URLs hostname. See <unwatch>.
 		 *
 		 *	Examples:
 		 *
@@ -3159,11 +3545,14 @@
 				href : url || document.location.href,
 				url : methods.url,
 				scheme : methods.scheme,
+				user : methods.user,
+				password : methods.password,
 				host : methods.host,
 				port : methods.port,
 				path : methods.path,
 				query : methods.query,
 				fragment : methods.fragment,
+				proxy : methods.proxy,
 				"goto" : methods [ "goto" ],
 				watch : function ( callback )
 				{
@@ -3174,6 +3563,16 @@
 					/* Set a watch on the href or src selectors */ 
 
 					return $( "[href*=\"" + host + "\"],[src*=\"" + host + "\"]" ).jurlp ( "watch", callback );
+				},
+				unwatch : function ( )
+				{
+					/* Get the current host name */ 
+
+					var host = this.host ( );
+
+					/* Set a watch on the href or src selectors */ 
+
+					return $( "[href*=\"" + host + "\"],[src*=\"" + host + "\"]" ).jurlp ( "unwatch" );
 				}
 			};
 		};
