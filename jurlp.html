@@ -76,7 +76,7 @@
 				// set the needed variables
 				var colorTags = [];
 				var paletteCount = 0;
-				var paletteSrc = [    "#BF1534", "#498C37", "#0367A6", "#F27B35", "#DCC50D", "#8F29BF"  ];
+				var paletteSrc = [    "#BF1534", "#498C37", "#F27B35", "#0367A6", "#DCC50D", "#8F29BF"  ];
 				
 				// default options
 				var options = {
@@ -190,10 +190,11 @@
 							{
 								filter : null,
 								fragment : null,
-								goto : null,
+								"goto" : null,
 								host : null,
 								initialise : null,
-								interface : null,
+								"interface" : null,
+								password : null,
 								path : null,
 								port : null,
 								proxy : null,
@@ -202,6 +203,7 @@
 								scheme : null,
 								unwatch : null,
 								url : null,
+								user : null,
 								watch : null
 							};
 
@@ -212,9 +214,157 @@
 						}
 					);
 
+					module ( "Direct URL manipulation" );
+
+					test
+					(
+						"http://user:password@www.example.com:8080/path/file.name?param1=value1&param2=value2&param3=value3#fragment",
+						function ( )
+						{
+							var urlObject =
+							{
+								scheme : "http://",
+								user : "user",
+								password : "password",
+								host : "www.example.com",
+								port : "8080",
+								path : "/path/file.name",
+								query : "?param1=value1&param2=value2&param3=value3",
+								fragment : "#fragment"
+							};
+
+							expect ( 44 );
+
+							var urlString = "http://user:password@www.example.com:8080/path/file.name?param1=value1&param2=value2&param3=value3#fragment";
+
+							var url = $.jurlp ( urlString );
+
+							var expectedInterface =
+							{
+								fragment : null,
+								"goto" : null,
+								host : null,
+								password : null,
+								path : null,
+								port : null,
+								proxy : null,
+								query : null,
+								scheme : null,
+								unwatch : null,
+								url : null,
+								user : null,
+								watch : null
+							};
+
+							for ( var method in expectedInterface )
+							{
+								ok ( url [ method ], method );
+							}
+
+							var actualUrlObject = url.url ( );
+
+							delete actualUrlObject.toString;
+
+							/* Get an verify all values */ 
+
+							deepEqual ( actualUrlObject, urlObject, "url.url()" );
+
+							equal ( url.url ( ).toString ( ), urlString, "url.url().toString()" );
+
+							equal ( url.scheme ( ), urlObject.scheme, "url.scheme()" );
+
+							equal ( url.user ( ), urlObject.user, "url.user()" );
+
+							equal ( url.password ( ), urlObject.password, "url.password()" );
+
+							equal ( url.host ( ), urlObject.host, "url.host()" );
+
+							equal ( url.port ( ), urlObject.port, "url.port()" );
+
+							equal ( url.path ( ).toString ( ), urlObject.path, "url.path().toString()" );
+
+							equal ( url.path ( ).length, 2, "url.path().length" );
+
+							equal ( url.path ( ) [ 0 ], "path", "url.path()[0]" );
+
+							equal ( url.path ( ) [ 1 ], "file.name", "url.path()[1]" );
+
+							equal ( url.query ( ).toString ( ), urlObject.query, "url.query().toString()" );
+
+							equal ( url.query ( ).param1, "value1", "url.query().param1" );
+
+							equal ( url.query ( ).param2, "value2", "url.query().param2" );
+
+							equal ( url.query ( ).param3, "value3", "url.query().param3" );
+
+							equal ( url.fragment ( ), urlObject.fragment, "url.fragment()" );
+
+							/* Set all posible values */ 
+
+							/* Modify the fragment */ 
+
+							equal ( url.fragment ( "#newfragment" ).url ( ).toString ( ), "http://user:password@www.example.com:8080/path/file.name?param1=value1&param2=value2&param3=value3#newfragment", "url.fragment(\"#newfragment\")" );
+
+							/* Append to the query string */ 
+
+							equal ( url.query ( "newparam1=newvalue1&newparam2=newvalue2&newparam3=newvalue3" ).url ( ).toString ( ), "http://user:password@www.example.com:8080/path/file.name?param1=value1&param2=value2&param3=value3&newparam1=newvalue1&newparam2=newvalue2&newparam3=newvalue3#newfragment", "url.query(\"newparam1=newvalue1&newparam2=newvalue2&newparam3=newvalue3\")" );
+
+							/* Remove/ammend existing parameters */ 
+
+							equal ( url.query ( { "newparam1" : null, "newparam2" : "changed", "newparam3" : null, "newparam4" : "newvalue4" } ).url ( ).toString ( ), "http://user:password@www.example.com:8080/path/file.name?param1=value1&param2=value2&param3=value3&newparam2=changed&newparam4=newvalue4#newfragment", "url.query({\"newparam1\":null,\"newparam2\":\"changed\",\"newparam3\":null,\"newparam4\":\"newvalue4\"}" );
+
+							/* Set the query string */ 
+
+							equal ( url.query ( "?param1=value1&param2=value2&param3=value3" ).url ( ).toString ( ), "http://user:password@www.example.com:8080/path/file.name?param1=value1&param2=value2&param3=value3#newfragment", "url.query(\"?param1=value1&param2=value2&param3=value3\")" );
+
+							/* Append to the path */ 
+
+							equal ( url.path ( "./something" ).url ( ).toString ( ), "http://user:password@www.example.com:8080/path/file.name/something?param1=value1&param2=value2&param3=value3#newfragment", "url.path(\"./something\")" );
+
+							/* Remove a path element */ 
+
+							equal ( url.path ( ".." ).url ( ).toString ( ), "http://user:password@www.example.com:8080/path/file.name?param1=value1&param2=value2&param3=value3#newfragment", "url.path(\"..\")" );
+
+							/* Remove and append path element */ 
+
+							equal ( url.path ( "../../newpath/newfile.name" ).url ( ).toString ( ), "http://user:password@www.example.com:8080/newpath/newfile.name?param1=value1&param2=value2&param3=value3#newfragment", "url.path(\"../../newpath/newfile.name\")" );
+
+							/* Set the path */ 
+
+							equal ( url.path ( "/path/file.name" ).url ( ).toString ( ), "http://user:password@www.example.com:8080/path/file.name?param1=value1&param2=value2&param3=value3#newfragment", "url.path(\"/path/file.name\")" );
+
+							/* Set the port */ 
+
+							equal ( url.port ( "443" ).url ( ).toString ( ), "http://user:password@www.example.com:443/path/file.name?param1=value1&param2=value2&param3=value3#newfragment", "url.port(\"443\")" );
+
+							equal ( url.host ( "www.newexample.com" ).url ( ).toString ( ), "http://user:password@www.newexample.com:443/path/file.name?param1=value1&param2=value2&param3=value3#newfragment", "url.host(\"www.newexample.com\")" );
+							equal ( url.user ( "newuser" ).url ( ).toString ( ), "http://newuser:password@www.newexample.com:443/path/file.name?param1=value1&param2=value2&param3=value3#newfragment", "url.user(\"newuser\")" );
+							equal ( url.password ( "newpassword" ).url ( ).toString ( ), "http://newuser:newpassword@www.newexample.com:443/path/file.name?param1=value1&param2=value2&param3=value3#newfragment", "url.password(\"newpassword\")" );
+							equal ( url.scheme ( "ftp://" ).url ( ).toString ( ), "ftp://newuser:newpassword@www.newexample.com:443/path/file.name?param1=value1&param2=value2&param3=value3#newfragment", "url.scheme(\"ftp://\")" );
+
+							equal ( url.scheme ( "https://" ).user ( "user" ).password ( "password" ).host ( "www.example.com" ).port("8080").path ( "/" ).query ( { } ).query ( { "param" : "value" } ).fragment ( "#fragment" ).url ( ).toString ( ), "https://user:password@www.example.com:8080/?param=value#fragment", "url.scheme(\"https://\").user(\"user\").password(\"password\").host(\"www.example.com\").port(\"8080\").path(\"/\").query({}).query({\"param\":\"value\"}).fragment(\"#fragment\").url().toString()" );
+
+							url.watch(function(element, selector){
+								deepEqual ( element.jurlp("url") [ 0 ], url.url(), "$.jurlp(url.host()).watch()" );
+							});
+
+							$("body").append("<a href=\""+url.url().toString()+"\"></a>");
+
+							// Stop watching for URLs.
+							url.unwatch ( );
+						}
+					);
+
 					var getHref = function ( )
 					{
-						return this.attr ( "href" ) || this.attr ( "src" ) || document.location.href;
+						var url = this.attr ( "href" ) || this.attr ( "src" ) || document.location.href;
+
+						if ( url.substring ( 0, 11 ).toLowerCase ( ) == "javascript:" )
+						{
+							url = document.location.href;
+						}
+
+						return url;
 					};
 
 					/* Provide a test function to get/set/parse a URL for a given element */ 
@@ -226,11 +376,13 @@
 						var newUrl =
 						{
 							scheme : "https://",
+							user : "newusername",
+							password : "newpassword",
 							host : "www.newexample.com",
 							port : "90",
 							path : "/newpath/newfile.name",
 							query : "?newparam1=newvalue1&newparam2=newvalue2",
-							fragment : "#newfragment",
+							fragment : "#newfragment"
 						};
 
 						/* Get the expected URL object for this element and strip its toString() method */ 
@@ -238,6 +390,7 @@
 						var expected = element.jurlp ( "url" ) [ 0 ];
 
 						delete expected.toString;
+						delete expected.script;
 
 						/* Return the parse/get/set function */ 
 
@@ -256,7 +409,17 @@
 									expected [ segment ] = newUrl [ segment ];
 
 									/* Set the href segment for the element */ 
+
 									element.jurlp ( segment, newUrl [ segment ] );
+
+									/* If a username was supplied, then set the password too (as this segment cannot be set alone) */ 
+
+									if ( segment == "user" )
+									{
+										expected [ "password" ] = newUrl [ "password" ];
+
+										element.jurlp ( "password", newUrl [ "password" ] );
+									}
 
 									/* Retrieve the updated element URL object and remove the toString() method */ 
 
@@ -266,7 +429,7 @@
 
 									/* Compare the actual and expected URL objects */ 
 
-									deepEqual ( expected, a, g + " URL object (" + segment + ")" );
+									deepEqual ( a, expected, g + " URL object (" + segment + ")" );
 
 									/* Restore the element href value */ 
 
@@ -274,7 +437,7 @@
 
 									/* Ensure the value was restored properly */ 
 
-									equals ( oldVal, element.jurlp ( "url" ) [ 0 ].toString ( ), "Restoring URL" );
+									equals ( element.jurlp ( "url" ) [ 0 ].toString ( ), oldVal, "Restoring URL" );
 								};
 							}
 							case "get":
@@ -344,6 +507,11 @@
 
 						var url = getHref.apply ( $this );
 
+						if ( $this.attr ( "href" ) != null && $this.attr ( "href" ).substring ( 0, 11 ).toLowerCase ( ) == "javascript:" )
+						{
+							url = $this.attr ( "href" ).substring ( 11 );
+						}
+
 						/* Get parse tests */ 
 
 						ourTest("Parse", url, getTest("parse",$this));
@@ -351,6 +519,8 @@
 						/* Get get tests */ 
 
 						ourTest("Get", "Scheme "+url, getTest("get",$this,"scheme"));
+						ourTest("Get", "User "+url, getTest("get",$this,"user"));
+						ourTest("Get", "Password "+url, getTest("get",$this,"password"));
 						ourTest("Get", "Host "+url, getTest("get",$this,"host"));
 						ourTest("Get", "Port "+url, getTest("get",$this,"port"));
 						ourTest("Get", "Path "+url, getTest("get",$this,"path"));
@@ -360,6 +530,8 @@
 						/* Get set tests */ 
 
 						ourTest("Set", "Scheme "+url, getTest("set",$this,"scheme"));
+						ourTest("Set", "User/password "+url, getTest("set",$this,"user"));
+						//ourTest("Set", "Password "+url, getTest("set",$this,"password"));
 						ourTest("Set", "Host "+url, getTest("set",$this,"host"));
 						ourTest("Set", "Port "+url, getTest("set",$this,"port"));
 						ourTest("Set", "Path "+url, getTest("set",$this,"path"));
@@ -401,13 +573,17 @@
 
 					$( "a.segment-test" ).each ( testElement );
 
+					module ( "Image URL" );
+
+					$( "img.segment-test" ).each ( testElement );
+
 					module ( "Filter URL" );
 
 					test($( "#url16" ).attr ( "href" ), function (){
 						var obj = $( "a.filter-test" );
 
 						equals ( obj.length, 1, "Got correct length" );
-						equals ( obj.attr("id"), "url16", "Got correct element" );
+						equals ( obj.attr ( "id" ), "url19", "Got correct element" );
 						
 						var result;
 
@@ -643,12 +819,19 @@
 			<a id="url13" class="segment-test" href="http://www.example.com/path/file.name#fragment"></a>
 			<a id="url14" class="segment-test" href="http://www.example.com/?param1=value1&param2=value2&param3=value3#fragment"></a>
 			<a id="url15" class="segment-test" href="http://www.example.com/?param1=value1&param2=value2&param3=value3"></a>
+			<img id="url16" class="segment-test" src="http://www.example.com/path/file.name?param1=value1&param2=value2&param3=value3#fragment"/>
 
-			<img id="img1" class="segment-test" src="http://www.example.com/folder/file.img" />
+			<!-- Contains username/password -->
+
+			<a id="url17" class="segment-test" href="http://user:password@www.example.com:8080/path/file.name?param1=value1&param2=value2&param3=value3#fragment"></a>
+
+			<!-- Contains JavaScript href attribute -->
+
+			<a id="url18" class="segment-test" href="javascript: alert('JavaScript in the href attribute')"></a>
 
 			<!-- URL for testing filtering -->
 
-			<a id="url16" class="filter-test" href="http://www.example.com:8080/path/file.name?param1=value1&param2=value2&param3=value3#fragment"></a>
+			<a id="url19" class="filter-test" href="http://www.example.com:8080/path/file.name?param1=value1&param2=value2&param3=value3#fragment"></a>
 
 			<!-- Container to populate with URLs for the watch test -->
 
