@@ -22,7 +22,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 Documentation
 -------------
 
-View the full [HTML documentation](http://tombonner.github.com/jurlp/doc.1.0.2/index.html).
+View the full [HTML documentation](http://tombonner.github.com/jurlp/doc/index.html).
 
 Unit test
 ---------
@@ -80,10 +80,12 @@ For the purposes of this plugin, URLs can be represented either as a string, for
 
 {
     scheme: "http://"
-    host: "www.example.com"
-    port: "8080" // Note the missing leading colon!
-    path: "/path/file.name"
-    query: "?query=string"
+    user: "username",
+    password: "password",
+    host: "www.example.com",
+    port: "8080",
+    path: "/path/file.name",
+    query: "?query=string",
     fragment: "#anchor"
 }
 
@@ -152,14 +154,20 @@ $("a:eq(0)").jurlp("unwatch");
 // Parse an element's text for URLs and create/return anchor elements
 $("<div>www.example.com</div>").jurlp();
 
-// Get an interface for parsing the URL
-url = $.jurlp("www.example.com");
+// Get an interface for parsing/manipulating the supplied URL
+url = $.jurlp("http://www.example.com:80/path/file.name?param1=value1#fragment");
 
 // Parse the URL to an object.
 url.url();
 
 // Get the URL scheme.
 url.scheme();
+
+// Get the URL user name.
+url.user();
+
+// Get the URL password.
+url.password();
 
 // Get the URL host.
 url.host();
@@ -174,10 +182,51 @@ url.path();
 url.query();
 
 // Get a specific parameter value from the URL query.
-url.query().parameter;
+url.query().param1;
 
 // Get the URL fragment.
 url.fragment();
+
+// Set the full URL.
+url.url("http://www.example.com:80/path/file.name?param1=value1#fragment");
+
+// Set the URL scheme.
+url.scheme("https://");
+
+// Set the URL user name.
+url.user("user");
+
+// Set the URL password.
+url.password("password");
+
+// Set the URL host.
+url.host("www.newexample.com");
+
+// Set the URL port.
+url.port("80");
+
+// Set the URL path.
+url.path("/newpath/newfile.file");
+
+// Append to the URL path.
+url.path("./newfile.file");
+
+// Remove two path elements and append to the URL path.
+url.path("../../newfile.file");
+
+// Set the URL query.
+url.query("?param=value");
+
+// Append/modify the URL query (string or object)
+url.query("param=value");
+url.query({"param":"value"});
+
+// Remove the URL query
+url.query("");
+url.query({});
+
+// Set the URL fragment.
+url.fragment("#newfragment");
 
 ```
 
