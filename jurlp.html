@@ -390,7 +390,6 @@
 						var expected = element.jurlp ( "url" ) [ 0 ];
 
 						delete expected.toString;
-						delete expected.script;
 
 						/* Return the parse/get/set function */ 
 
@@ -417,7 +416,6 @@
 									if ( segment == "user" )
 									{
 										expected [ "password" ] = newUrl [ "password" ];
-
 										element.jurlp ( "password", newUrl [ "password" ] );
 									}
 
@@ -519,6 +517,7 @@
 						/* Get get tests */ 
 
 						ourTest("Get", "Scheme "+url, getTest("get",$this,"scheme"));
+
 						ourTest("Get", "User "+url, getTest("get",$this,"user"));
 						ourTest("Get", "Password "+url, getTest("get",$this,"password"));
 						ourTest("Get", "Host "+url, getTest("get",$this,"host"));
@@ -530,11 +529,15 @@
 						/* Get set tests */ 
 
 						ourTest("Set", "Scheme "+url, getTest("set",$this,"scheme"));
-						ourTest("Set", "User/password "+url, getTest("set",$this,"user"));
+
+						if ( $this [ 0 ].tagName != "img" && $this.is ( "[src]" ) == false )
+						{
+							ourTest("Set", "User/password "+url, getTest("set",$this,"user"));
+						}
 						//ourTest("Set", "Password "+url, getTest("set",$this,"password"));
 						ourTest("Set", "Host "+url, getTest("set",$this,"host"));
-						ourTest("Set", "Port "+url, getTest("set",$this,"port"));
 						ourTest("Set", "Path "+url, getTest("set",$this,"path"));
+						ourTest("Set", "Port "+url, getTest("set",$this,"port"));
 						ourTest("Set", "Query "+url, getTest("set",$this,"query"));
 						ourTest("Set", "Fragment "+url, getTest("set",$this,"fragment"));
 
@@ -579,11 +582,11 @@
 
 					module ( "Filter URL" );
 
-					test($( "#url16" ).attr ( "href" ), function (){
+					test($( "#filter-url" ).attr ( "href" ), function (){
 						var obj = $( "a.filter-test" );
 
 						equals ( obj.length, 1, "Got correct length" );
-						equals ( obj.attr ( "id" ), "url19", "Got correct element" );
+						equals ( obj.attr ( "id" ), "filter-url", "Got correct element" );
 						
 						var result;
 
@@ -791,6 +794,53 @@
 							equals ( $( "div.text-test" ).html ( ), $( "div.text-test-result" ).html ( ), "Element HTML" );
 						}
 					);
+
+					module ( "Anchor JavaScript" );
+
+					test
+					(
+						$( ".javascript-test" ).attr ( "href" ),
+						function ( )
+						{
+							var urlObject = $( ".javascript-test" ).jurlp ( "url" ) [ 0 ];
+
+							equals ( urlObject.toString ( ), $( ".javascript-test" ).attr ( "href" ), "jurlp(\"url\").toString()" );
+
+							delete urlObject.javascript;
+							delete urlObject.toString;
+
+							var expectedUrlObject = $.jurlp(document.location.href).url();
+
+							delete expectedUrlObject.toString;
+
+							deepEqual ( urlObject, expectedUrlObject, "URL string" );
+						}
+					);
+
+					module ( "Anchor Mailto" );
+
+					test
+					(
+						$( ".mailto-test" ).attr ( "href" ),
+						function ( )
+						{
+							var urlObject = $( ".mailto-test" ).jurlp ( "url" ) [ 0 ];
+
+							equals ( urlObject.toString ( ), $( ".mailto-test" ).attr ( "href" ), "jurlp(\"url\").toString()" );
+
+							$( ".mailto-test" ).jurlp ( "user", "newuser" );
+
+							equals ( $( ".mailto-test" ).attr ( "href" ), "mailto:newuser@example.com?subject=Subject&body=Body", "jurlp(\"user\",\"newuser\")" );
+
+							$( ".mailto-test" ).jurlp ( "host", "newexample.com" );
+
+							equals ( $( ".mailto-test" ).attr ( "href" ), "mailto:newuser@newexample.com?subject=Subject&body=Body", "jurlp(\"host\",\"newexample.com\")" );
+
+							$( ".mailto-test" ).jurlp ( "query", { subject : "New%20subject", body : "New%20body" } );
+
+							equals ( $( ".mailto-test" ).attr ( "href" ), "mailto:newuser@newexample.com?subject=New%20subject&body=New%20body", "jurlp(\"query\",{subject:\"New subject\",body:\"New body\"})" );
+						}
+					);
 				}
 			);
 		</script>
@@ -827,11 +877,15 @@
 
 			<!-- Contains JavaScript href attribute -->
 
-			<a id="url18" class="segment-test" href="javascript: alert('JavaScript in the href attribute')"></a>
+			<a id="url18" class="javascript-test" href="javascript: alert('JavaScript in the href attribute')"></a>
+
+			<!-- Contains mailto href attribute -->
+
+			<a id="url19" class="mailto-test" href="mailto:user@example.com?subject=Subject&body=Body"></a>
 
 			<!-- URL for testing filtering -->
 
-			<a id="url19" class="filter-test" href="http://www.example.com:8080/path/file.name?param1=value1&param2=value2&param3=value3#fragment"></a>
+			<a id="filter-url" class="filter-test" href="http://www.example.com:8080/path/file.name?param1=value1&param2=value2&param3=value3#fragment"></a>
 
 			<!-- Container to populate with URLs for the watch test -->
 
@@ -846,6 +900,8 @@
 				</p>
 				This is more text within the div, with a link to www.example2.com.
 				<p>
+					<a href="http://www.shouldnotbemodified.com/">www.shouldnotbemodified.com</a>
+					<img src="http://www.shouldnotbemodified.com/" />
 					http://www.example.com/
 					http://www.example.com:8080/
 					http://www.example.com:8080/path/file.name
@@ -854,6 +910,22 @@
 					http://www.example.com:8080/path/file.name#fragment
 					http://www.example.com:8080/?param1=value1&amp;param2=value2&amp;param3=value3#fragment
 					http://www.example.com:8080/?param1=value1&amp;param2=value2&amp;param3=value3
+					url.com
+					url-with-dashes.com
+					www.urlwithprefix.com
+					127.0.0.1/url.php
+					http://192.168.0.1
+					ftp://url.com/path/name/
+					ftp://user:pass@url.com/path/name/
+					view-source://url.com/#fragment
+					http://url.com/#fragment
+					http://url.com/?query=string&other=value
+					http://user:pass@url.com/?query=string&other=value
+					https://user:pass@url.com/?query=string&other=value#fragment
+					spotify:hepp:happ
+					skype:hepp:happ
+					mailto:hepp@happ.com?subject=some%20value
+					irc://irc.homelien.no
 				</p>
 				And a final URL http://www.example.com:8080/path/file.name?param1=value1&amp;param2=value2&amp;param3=value3#fragment on the end.
 			</div>
@@ -864,6 +936,8 @@
 				</p>
 				This is more text within the div, with a link to <a href="http://www.example2.com/" class="jurlp-no-watch">www.example2.com</a>.
 				<p>
+					<a href="http://www.shouldnotbemodified.com/">www.shouldnotbemodified.com</a>
+					<img src="http://www.shouldnotbemodified.com/">
 					<a href="http://www.example.com/" class="jurlp-no-watch">http://www.example.com/</a>
 					<a href="http://www.example.com:8080/" class="jurlp-no-watch">http://www.example.com:8080/</a>
 					<a href="http://www.example.com:8080/path/file.name" class="jurlp-no-watch">http://www.example.com:8080/path/file.name</a>
@@ -872,6 +946,22 @@
 					<a href="http://www.example.com:8080/path/file.name#fragment" class="jurlp-no-watch">http://www.example.com:8080/path/file.name#fragment</a>
 					<a href="http://www.example.com:8080/?param1=value1&amp;param2=value2&amp;param3=value3#fragment" class="jurlp-no-watch">http://www.example.com:8080/?param1=value1&amp;param2=value2&amp;param3=value3#fragment</a>
 					<a href="http://www.example.com:8080/?param1=value1&amp;param2=value2&amp;param3=value3" class="jurlp-no-watch">http://www.example.com:8080/?param1=value1&amp;param2=value2&amp;param3=value3</a>
+					<a href="http://url.com/" class="jurlp-no-watch">url.com</a>
+					<a href="http://url-with-dashes.com/" class="jurlp-no-watch">url-with-dashes.com</a>
+					<a href="http://www.urlwithprefix.com/" class="jurlp-no-watch">www.urlwithprefix.com</a>
+					<a href="http://127.0.0.1/url.php" class="jurlp-no-watch">127.0.0.1/url.php</a>
+					<a href="http://192.168.0.1/" class="jurlp-no-watch">http://192.168.0.1</a>
+					<a href="ftp://url.com/path/name/" class="jurlp-no-watch">ftp://url.com/path/name/</a>
+					<a href="ftp://user:pass@url.com/path/name/" class="jurlp-no-watch">ftp://user:pass@url.com/path/name/</a>
+					<a href="view-source://url.com/#fragment" class="jurlp-no-watch">view-source://url.com/#fragment</a>
+					<a href="http://url.com/#fragment" class="jurlp-no-watch">http://url.com/#fragment</a>
+					<a href="http://url.com/?query=string&amp;other=value" class="jurlp-no-watch">http://url.com/?query=string&amp;other=value</a>
+					<a href="http://user:pass@url.com/?query=string&amp;other=value" class="jurlp-no-watch">http://user:pass@url.com/?query=string&amp;other=value</a>
+					<a href="https://user:pass@url.com/?query=string&amp;other=value#fragment" class="jurlp-no-watch">https://user:pass@url.com/?query=string&amp;other=value#fragment</a>
+					<a href="spotify:hepp:happ" class="jurlp-no-watch">spotify:hepp:happ</a>
+					<a href="skype:hepp:happ" class="jurlp-no-watch">skype:hepp:happ</a>
+					<a href="mailto:hepp@happ.com?subject=some%20value" class="jurlp-no-watch">mailto:hepp@happ.com?subject=some%20value</a>
+					<a href="irc://irc.homelien.no/" class="jurlp-no-watch">irc://irc.homelien.no</a>
 				</p>
 				And a final URL <a href="http://www.example.com:8080/path/file.name?param1=value1&amp;param2=value2&amp;param3=value3#fragment" class="jurlp-no-watch">http://www.example.com:8080/path/file.name?param1=value1&amp;param2=value2&amp;param3=value3#fragment</a> on the end.
 			</div>
