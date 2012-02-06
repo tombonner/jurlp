@@ -5,7 +5,7 @@ JQuery URL parser plugin for parsing, manipulating, filtering and monitoring URL
 
 **Version**
 
-1.0.3
+1.0.4
 
 **License**
 
@@ -352,3 +352,66 @@ $("body").append("<a href=\"www.example.com\"></a>");
 watch.jurlp("unwatch");
 
 ```
+
+Unknown URLs.
+-------------
+
+Overview of unknown URL parsing.
+
+**Unknown scheme**
+
+The parser will attempt to parse any type of URL it encounters based on its scheme.  However, not all URLs are parsable, for example “spotify:track:<trackid>”.  In this case, the following URL object is returned;
+
+``` javascript
+
+{
+    scheme: "spotify:",
+    url: "track:<trackid>"
+}
+
+```
+
+The unknown URL object will always contain the scheme (if present), for filtering purposes, and also contains a toString() method, which will convert the URL object back to the original URL string.
+
+**mailto**
+
+”mailto:” URLs are parsable in the same manner as a regular HTTP URL.  For example, the following URL object is returned for a URL with a “mailto:” scheme;
+
+``` javascript
+
+{
+    scheme: "mailto:"
+    user: "username",
+    password: "",
+    host: "www.example.com",
+    port: "",
+    path: "",
+    query: "?subject=subject&body=body",
+    fragment: ""
+}
+
+```
+
+Therefore, “mailto:” URLs can be fully parsed using this parser, but note that it is not possible to set the password, port or fragment strings on a “mailto:” URL.
+
+**javascript**
+
+”javascript” URLs are parsable in the same manner as a regular HTTP URL.  For example, the following URL object is returned for a URL with a “javasrcipt:” scheme;
+
+``` javascript
+
+{
+    scheme: "javascript:"
+    user: "",
+    password: "",
+    host: "www.example.com",
+    port: "",
+    path: "/",
+    query: "",
+    fragment: "",
+    javascript: "alert('!');"
+}
+
+```
+
+Therefore, “javascript:” URLs can be fully parsed using this parser, but note that the current “document.location.href” will always be parsed/returned as the main URL object.

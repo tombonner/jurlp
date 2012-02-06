@@ -14,7 +14,7 @@
  *
  *	About: Version
  *
- *	1.0.3
+ *	1.0.4
  *
  *	About: License
  *
@@ -95,7 +95,7 @@
  *		port: "8080",
  *		path: "/path/file.name",
  *		query: "?query=string",
- *		fragment: "#anchor"
+ *		fragment: "#anchor" 
  *	}
  *
  *	(end code)
@@ -130,7 +130,13 @@
  *	// Get or set individual URL segments for the element(s)
  *	$("a").jurlp("scheme");
  *	$("a").jurlp("scheme", "https://");
- *	
+ *
+ *	$("a").jurlp("user");
+ *	$("a").jurlp("user", "username");
+ *
+ *	$("a").jurlp("password");
+ *	$("a").jurlp("password", "password");
+ *
  *	$("a").jurlp("host");
  *	$("a").jurlp("host", "www.example.com");
  *	
@@ -148,6 +154,8 @@
  *	
  *	// Filter on URL segments
  *	$("a").jurlp("filter", "scheme", "^=", "http")
+ *	      .jurlp("filter", "user", "=", "user")
+ *	      .jurlp("filter", "password", "=", "password")
  *	      .jurlp("filter", "host", "=", "www.example.com")
  *	      .jurlp("filter", "port", "!=", "8080")
  *	      .jurlp("filter", "path", "$=", ".html")
@@ -375,6 +383,71 @@
  */
  
 /**
+ *	Section: Unknown URLs.
+ *
+ *	Overview of unknown URL parsing.
+ *
+ *	Unknown scheme:
+ *
+ *	The parser will attempt to parse any type of URL it encounters based on its scheme. However, not all URLs are parsable, for example "spotify:track:<trackid>". In this case, the following URL object is returned;
+ *
+ *	(start code)
+ *
+ *	{
+ *		scheme: "spotify:",
+ *		url: "track:<trackid>"
+ *	}
+ *
+ *	(end code)
+ *
+ *	The unknown URL object will always contain the scheme (if present), for filtering purposes, and also contains a toString() method, which will convert the URL object back to the original URL string.
+ *
+ *	mailto:
+ *
+ *	"mailto:" URLs are parsable in the same manner as a regular HTTP URL. For example, the following URL object is returned for a URL with a "mailto:" scheme;
+ *
+ *	(start code)
+ *
+ *	{
+ *		scheme: "mailto:"
+ *		user: "username",
+ *		password: "",
+ *		host: "www.example.com",
+ *		port: "",
+ *		path: "",
+ *		query: "?subject=subject&body=body",
+ *		fragment: "" 
+ *	}
+ *
+ *	(end code)
+ *
+ *	Therefore, "mailto:" URLs can be fully parsed using this parser, but note that it is not possible to set the password, port or fragment strings on a "mailto:" URL.
+ *
+ *	javascript:
+ *
+ *	"javascript" URLs are parsable in the same manner as a regular HTTP URL. For example, the following URL object is returned for a URL with a "javasrcipt:" scheme;
+ *
+ *	(start code)
+ *
+ *	{
+ *		scheme: "javascript:"
+ *		user: "",
+ *		password: "",
+ *		host: "www.example.com",
+ *		port: "",
+ *		path: "/",
+ *		query: "",
+ *		fragment: "",
+ *		javascript: "alert('!');"
+ *	}
+ *
+ *	(end code)
+ *
+ *	Therefore, "javascript:" URLs can be fully parsed using this parser, but note that the current "document.location.href" will always be parsed/returned as the main URL object.
+ *
+ **/
+ 
+/**
  *	Section: Operators.
  *
  *	Overview of filter operators.
@@ -415,8 +488,6 @@
 		 *	Regular expression for parsing URLs.
 		 *
 		 *	Taken from parseUri 1.2 (http://blog.stevenlevithan.com/archives/parseuri).
-		 *
-		 *	http://blog.stevenlevithan.com/archives/parseuri
 		 *
 		 **/ 
 
@@ -532,9 +603,9 @@
 					var modifiedHtml = false;
 					var match = "";
 
-					/* Regular expression for finding URLs (heisted from online, needs reviewing, although seemingly working well :) */ 
+					/* Regular expression for finding URLs in free text */ 
 
-					var findUrlRegExp = /((((http|ftp|https|nntp):\/\/)|www\.)[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:/~\+#!]*[\w\-\@?^=%&amp;/~\+#]))/i
+					var findUrlRegExp = /((((mailto|spotify|skype)\:([a-zA-Z0-9\.\-\:@\?\=\%]*))|((ftp|git|irc|ircs|irc6|pop|rss|ssh|svn|udp|feed|imap|ldap|nntp|rtmp|sftp|snmp|xmpp|http|https|telnet|ventrilo|webcal|view\-source)\:[\/]{2})?(([a-zA-Z0-9\.\-]+)\:([a-zA-Z0-9\.&;%\$\-]+)*@)*((25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9])\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])|localhost|([a-zA-Z0-9\-]+\.)*[a-zA-Z0-9\-]+\.(aero|arpa|asia|biz|cat|com|coop|edu|gov|info|int|jobs|mil|mobi|museum|name|net|org|pro|tel|travel|xn--0zwm56d|xn--11b5bs3a9aj6g|xn--80akhbyknj4f|xn--9t4b11yi5a|xn--deba0ad|xn--g6w251d|xn--hgbk6aj7f53bba|xn--hlcj6aya9esc7a|xn--jxalpdlp|xn--kgbechtv|xn--zckzah|[a-zA-Z]{2}))(\:[0-9]+)*(\/($|[a-zA-Z0-9\.\,\?\'\\\+&;%\$\=~_\-]+)?(#\w*)?)*))/i;
 
 					/* Store the elements HTML */ 
 
@@ -561,9 +632,28 @@
 
 					for ( var i = 0; i < urls.length; i++ )
 					{
-						/* Replace the unique ID with an anchor tag */ 
+						/* Get the postion of the current URL ID */ 
 
-						html = html.replace ( "$" + i, "<a href=\"[url]\" class=\"jurlp-no-watch\">[url]</a>".replace ( /\[url\]/g, urls [ i ] ) );
+						var pos = html.indexOf ( "$" + i );
+
+						/* Get the possible attribute name */ 
+
+						var attr = html.substring ( pos - 6, pos - 1 );
+
+						/* Does the URL reside within an attribute (i.e. an existing tag) */ 
+
+						if ( attr == "href=" || attr == " src=" || html.substring ( pos - 1, pos ) == ">" )
+						{
+							/* Replace the ID with the original URL (do not convert this URL to an anchor as it most likely is part of one) */ 
+
+							html = html.replace ( "$" + i, urls [ i ] );
+						}
+						else
+						{
+							/* Replace the unique ID with an anchor tag */ 
+
+							html = html.replace ( "$" + i, "<a href=\"[url]\" class=\"jurlp-no-watch\">[url]</a>".replace ( /\[url\]/g, urls [ i ] ) );
+						}
 					}
 
 					/* Did we change the HTML at all? */ 
@@ -588,18 +678,9 @@
 
 								var href = getHref.apply ( $( this ) );
 
-								/* Did the URL contain a valid protocol identifier? */ 
-
-								if ( href.indexOf ( "://" ) == -1 )
-								{
-									/* Glue on a protocol identifier, so as not to break the parser */
-
-									href = "http://" + href;
-								}
-
 								/* Sanitise the URL and reset the elements href */ 
 
-								setHref.apply ( $( this ), [ sanitiseUrl ( href ) ] );
+								setHref.apply ( $( this ), [ href ] );
 							}
 						);
 					}
@@ -845,15 +926,20 @@
 
 		var urlToObject = function ( url )
 		{
+			/* Was a null URL supplied? */ 
+
+			if ( url == null )
+			{
+				/* Return an empty object */ 
+
+				return { scheme : "", user : "", password : "", host : "", port : "", path : "", query : "", fragment : "" };
+			}
+
 			var credentials = { user : "", password : "" };
 
-			/* Does the URL contain JavaScript, and not a valid URI? */
-
-			if ( url.substring ( 0, 11 ).toLowerCase ( ) == "javascript:" )
+			if ( url.substring ( 0, 2 ) == "//" )
 			{
-				/* Return the document URL, and extend the URL object with the script (dirty hack) */ 
-
-				return $.extend ( urlToObject ( document.location.href ), { script : url.substring ( 11 ) } );
+				url = "http:" + url;
 			}
 
 			/* If a URL is supplied, ensure a protocol is specified, otherwise the parser will assume that the supplied host is the path */ 
@@ -886,11 +972,53 @@
 				}
 			}
 
-			/* Construct a new anchor element based on the supplied URL (let the browser do the parsing) */ 
+			/* Construct a new anchor element based on the supplied URL */ 
 
 			var a = document.createElement ( "a" );
 
+			/* Set the anchor href to the URL to parse (let the browser do (most of) the parsing) */ 
+
 			a.href = url;
+
+			/* Under IE, an anchor element containing a username and password is inaccessible, so we will probe "a.protocol" to test if we have access */ 
+
+			try
+			{
+				/* Check if the element is accessible */ 
+
+				var accessible = a.protocol;
+			}
+			catch ( err )
+			{
+				/* MSIE: A security problem occurred. (cannot access the anchor element) */ 
+
+				if ( err.number == -2146697202 )
+				{
+					/* IE hack!.. strip the username and password from the URL, and reparse */ 
+
+					var authority = "";
+
+					/* Were credentials found in the URL? */ 
+
+					if ( credentials.user != "" )
+					{
+						/* Build string containing the username and password to strip from the URL */ 
+
+						authority += credentials.user;
+
+						if ( credentials.password != "" )
+						{
+							authority += ":" + credentials.password;
+						}
+
+						authority += "@";
+
+						/* Strip the username and password from the URL and set the anchor href (this could in theory be done for all browsers) */ 
+
+						a.href = url.replace ( authority, "" );
+					}
+				}
+			}
 
 			/* Sanitise the protocol string */ 
 
@@ -916,7 +1044,7 @@
 
 			/* Strip of default port numbers if added, and not present in the original URL */ 
 
-			if ( ( port == "80" && url.indexOf ( ":80" ) == -1 ) || ( port == "443" && url.indexOf ( ":443" ) == -1 ) || port == "0" )
+			if ( ( port == "21" && url.indexOf ( ":21" ) == -1 ) || ( port == "80" && url.indexOf ( ":80" ) == -1 ) || ( port == "443" && url.indexOf ( ":443" ) == -1 ) || port == "0" )
 			{
 				port = "";
 			}
@@ -991,7 +1119,7 @@
 
 		var sanitiseUrl = function ( url )
 		{
-			return objectToUrl ( urlToObject ( url ) );
+			return uri.parse ( url ).toString ( );
 		};
 
 		/**
@@ -1039,7 +1167,7 @@
 		{
 			/* Convert the URL to an object */ 
 
-			var urlObject = urlToObject ( url );
+			var urlObject = uri.parse ( url );
 
 			/* Update the URL segment */ 
 
@@ -1074,7 +1202,7 @@
 			{
 				/* Return the URL string converted to an object */ 
 
-				return urlToObject ( url );
+				return uri.parse ( url );
 			}
 
 			/* Return the URL object */ 
@@ -1791,6 +1919,213 @@
 
 		/**
 		 *
+		 *	Section: URI parser interface.
+		 *
+		 *	All URI parsing is handled through this interface.
+		 *
+		 *	This section contains all parser interfaces utilised by the public parser interface.
+		 *
+		 *	ToDo: Extend this interface with the current URL segment parsing logic, and implement a more comprehensive URI parser set.
+		 *
+		 *	See http://en.wikipedia.org/wiki/URI_scheme for an overview of URIs.
+		 *
+		 **/ 
+
+		var uri =
+		{
+			/**
+			 *
+			 *	All URI object to string methods.
+			 *
+			 **/ 
+
+			toString :
+			{
+				/**
+				 *
+				 *	Function: uri.toString.http
+				 *
+				 *	Converts a URI object with an "http" scheme to a string.
+				 *
+				 **/ 
+
+				"http" : function ( )
+				{
+					return objectToUrl ( this );
+				},
+
+				/**
+				 *
+				 *	Function: uri.toString.mailto
+				 *
+				 *	Converts a URI object with a "mailto:" scheme to a string.
+				 *
+				 **/ 
+
+				"mailto" : function ( )
+				{
+					/* Blank invalid fields */ 
+
+					this.password = "";
+					this.path = "";
+					this.port = "";
+
+					return objectToUrl ( this );
+				},
+
+				/**
+				 *
+				 *	Function: uri.toString.javascript
+				 *
+				 *	Converts a URI object with a "javascript:" scheme to a string.
+				 *
+				 **/ 
+
+				"javascript" : function ( )
+				{
+					return "javascript:" + this.javascript;
+				},
+
+				/**
+				 *
+				 *	Function: uri.toString.generic
+				 *
+				 *	Converts an generic URI object to a string.
+				 *
+				 **/ 
+
+				"generic" : function ( )
+				{
+					return this.scheme + this.url;
+				}
+			},
+
+			/**
+			 *
+			 *	All URI string parsers.
+			 *
+			 **/ 
+
+			parsers :
+			{
+				/**
+				 *
+				 *	Function: uri.parsers.http
+				 *
+				 *	Parse a URI with a "http://" scheme into a URI object.
+				 *
+				 **/ 
+
+				"http" : function ( url )
+				{
+					return $.extend ( urlToObject ( url ), { toString : uri.toString.http } );
+				},
+
+				/**
+				 *
+				 *	Function: uri.parsers.mailto
+				 *
+				 *	Parse a URI with a "mailto:" scheme into a URI object.
+				 *
+				 **/ 
+
+				"mailto" : function ( url )
+				{
+
+					return $.extend ( urlToObject ( url.substring ( 7 ) ), { scheme : "mailto:", toString : uri.toString.mailto } );
+				},
+
+				/**
+				 *
+				 *	Function: uri.parsers.javascript
+				 *
+				 *	Parse a URI with a "javascript:" scheme into a URI object.
+				 *
+				 **/ 
+
+				"javascript" : function ( url )
+				{
+					return $.extend ( urlToObject ( document.location.href ), { javascript : url.substring ( 11 ), toString : uri.toString.javascript } );
+				},
+
+				/**
+				 *
+				 *	Function: uri.parsers.generic
+				 *
+				 *	Parses any URI (URIs with a scheme seperator of "://" are parsed as "http://", everything else is treated as unknown..
+				 *
+				 **/ 
+
+				"generic" : function ( scheme, url )
+				{
+					/* Was a "//" specified in the scheme? */ 
+
+					if ( url.substring ( 0, 2 ) == "//" )
+					{
+						/* Parse as HTTP URL */ 
+
+						return $.extend ( urlToObject ( url.substring ( 2 ) ), { scheme : scheme + "://", toString : uri.toString.http } );
+					}
+
+					/* Unknown, store the schem (for filtering purposes), and simply append the remainder of the URI */ 
+
+					return { scheme : scheme + ":", url : url, toString : uri.toString.generic };
+				}
+			},
+
+			/**
+			 *
+			 *	Function: uri.parse
+			 *
+			 *	Parse a URI string based on scheme.
+			 *
+			 **/ 
+
+			parse : function ( uri )
+			{
+				/* Only parse strings */ 
+
+				if ( typeof uri != "string" )
+				{
+					/* URI object? */ 
+
+					return uri;
+				}
+
+				/* Try to determine the scheme */ 
+
+				var pos = uri.indexOf ( ":" );
+
+				/* Was a scheme seperator found? */ 
+
+				if ( pos != -1 )
+				{
+					/* Get the scheme name (from the start of the URI, until the first ":" character)*/ 
+
+					var scheme = uri.substring ( 0, pos ).toLowerCase ( );
+
+					/* Is a handler present for this scheme? */ 
+
+					if ( this.parsers [ scheme ] != null )
+					{
+						/* Parse the URI with a specific parser */ 
+
+						return this.parsers [ scheme ] ( uri );
+					}
+
+					/* Try to parse the URI generically */ 
+
+					return this.parsers.generic ( scheme, uri.substring ( pos + 1 ) );
+				}
+
+				/* Parse the URI with the HTTP parser, for now... */ 
+
+				return this.parsers.http ( uri );
+			}
+		};
+
+		/**
+		 *
 		 *	Section: Helper interface.
 		 *
 		 *	All private helper methods.
@@ -1837,7 +2172,7 @@
 
 			"parseUrl" : function ( )
 			{
-				return returnEachObject.apply ( this, [ function ( ) { return $.extend ( urlToObject ( getHref.apply ( this ) ), { toString : urlObjectToString } ); }, null ] );
+				return returnEachObject.apply ( this, [ function ( ) { return uri.parse ( getHref.apply ( this ) ); }, null ] );
 			},
 
 			/**
@@ -3350,14 +3685,15 @@
 			{
 				/* Get an arbitrary URL object */ 
 
-				var url = urlToObject ( getHref.apply ( this ) );
+				var url = uri.parse ( getHref.apply ( this ) );
 
 				/* Ensure operator is valid */
-				if(operator == "==")
+
+				if ( operator == "==" )
 				{
 					operator = "=";
 				}
-				
+
 				/* Ensure that the segment is valid, and that a filter method exists */ 
 
 				if ( ( segment == "url" || url [ segment ] != null ) && helpers.filters [ operator ] != null )
@@ -3384,7 +3720,7 @@
 							{
 								/* Use a segment of the URL */ 
 
-								actualValue = urlToObject ( url ) [ segment ];
+								actualValue = uri.parse ( url ) [ segment ];
 							}
 							else
 							{
