@@ -360,7 +360,7 @@ Overview of unknown URL parsing.
 
 **Unknown scheme**
 
-The parser will attempt to parse any type of URL it encounters based on its scheme.  However, not all URLs are parsable, for example “spotify:track:<trackid>”.  In this case, the following URL object is returned;
+The parser will attempt to parse any type of URL it encounters based on its scheme.  However, not all URLs are parsable, for example "spotify:track:<trackid>".  In this case, the following URL object is returned;
 
 ``` javascript
 
@@ -375,7 +375,7 @@ The unknown URL object will always contain the scheme (if present), for filterin
 
 **mailto**
 
-”mailto:” URLs are parsable in the same manner as a regular HTTP URL.  For example, the following URL object is returned for a URL with a “mailto:” scheme;
+"mailto:" URLs are parsable in the same manner as a regular HTTP URL.  For example, the following URL object is returned for a URL with a "mailto:" scheme;
 
 ``` javascript
 
@@ -392,11 +392,11 @@ The unknown URL object will always contain the scheme (if present), for filterin
 
 ```
 
-Therefore, “mailto:” URLs can be fully parsed using this parser, but note that it is not possible to set the password, port or fragment strings on a “mailto:” URL.
+Therefore, "mailto:" URLs can be fully parsed using this parser, but note that it is not possible to set the password, port or fragment strings on a "mailto:" URL.
 
 **javascript**
 
-”javascript” URLs are parsable in the same manner as a regular HTTP URL.  For example, the following URL object is returned for a URL with a “javasrcipt:” scheme;
+"javascript" URLs are parsable in the same manner as a regular HTTP URL.  For example, the following URL object is returned for a URL with a "javasrcipt:" scheme;
 
 ``` javascript
 
@@ -414,4 +414,4 @@ Therefore, “mailto:” URLs can be fully parsed using this parser, but note that i
 
 ```
 
-Therefore, “javascript:” URLs can be fully parsed using this parser, but note that the current “document.location.href” will always be parsed/returned as the main URL object.
+Therefore, "javascript:" URLs can be fully parsed using this parser, but note that the current "document.location.href" will always be parsed/returned as the main URL object.
