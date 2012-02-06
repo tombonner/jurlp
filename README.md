@@ -360,7 +360,7 @@ Overview of unknown URL parsing.
 
 **Unknown scheme**
 
-The parser will attempt to parse any type of URL it encounters based on its scheme.  However, not all URLs are parsable, for example "spotify:track:<trackid>".  In this case, the following URL object is returned;
+The parser will attempt to parse any type of URL it encounters based on its scheme.  However, not all URLs are parsable, for example `spotify:track:<trackid>`.  In this case, the following URL object is returned;
 
 ``` javascript
 
