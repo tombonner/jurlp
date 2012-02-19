@@ -435,7 +435,7 @@
 
 									/* Ensure the value was restored properly */ 
 
-									equals ( element.jurlp ( "url" ) [ 0 ].toString ( ), oldVal, "Restoring URL" );
+									equal ( element.jurlp ( "url" ) [ 0 ].toString ( ), oldVal, "Restoring URL" );
 								};
 							}
 							case "get":
@@ -585,8 +585,8 @@
 					test($( "#filter-url" ).attr ( "href" ), function (){
 						var obj = $( "a.filter-test" );
 
-						equals ( obj.length, 1, "Got correct length" );
-						equals ( obj.attr ( "id" ), "filter-url", "Got correct element" );
+						equal ( obj.length, 1, "Got correct length" );
+						equal ( obj.attr ( "id" ), "filter-url", "Got correct element" );
 						
 						var result;
 
@@ -596,126 +596,126 @@
 						var operator = "!=";
 
 						result = obj.jurlp("filter", "scheme", "!=", "http://");
-						equals ( result.length, val, "Discovered URLs by scheme (!=)" );
+						equal ( result.length, val, "Discovered URLs by scheme (!=)" );
 
 						result = obj.jurlp("filter", "host", "!=", "www.example.com");
-						equals ( result.length, val, "Discovered URLs by host (!=)" );
+						equal ( result.length, val, "Discovered URLs by host (!=)" );
 
 						result = obj.jurlp("filter", "port", "!=", "8080");
-						equals ( result.length, val, "Discovered URLs by port (!=)" );
+						equal ( result.length, val, "Discovered URLs by port (!=)" );
 
 						result = obj.jurlp("filter", "path", "!=", "/path/file.name");
-						equals ( result.length, val, "Discovered URLs by path (!=)" );
+						equal ( result.length, val, "Discovered URLs by path (!=)" );
 
 						result = obj.jurlp("filter", "query", "!=", "?param1=value1&param2=value2&param3=value3");
-						equals ( result.length, val, "Discovered URLs by query (!=)" );
+						equal ( result.length, val, "Discovered URLs by query (!=)" );
 
 						result = obj.jurlp("filter", "fragment", "!=", "#fragment");
-						equals ( result.length, val, "Discovered URLs by fragment (!=)" );
+						equal ( result.length, val, "Discovered URLs by fragment (!=)" );
 
 						/* Find element */ 
 
 						// ==
 
 						result = obj.jurlp("filter", "host", "==", "www.example.com");
-						equals ( result.length, 1, "Discovered URLs by host (==)" );
+						equal ( result.length, 1, "Discovered URLs by host (==)" );
 
 						// !=
 
 						result = obj.jurlp("filter", "host", "!=", "www.notexample.com");
-						equals ( result.length, 1, "Discovered URLs by host (!=)" );
+						equal ( result.length, 1, "Discovered URLs by host (!=)" );
 
 						// ^=
 						
 						result = obj.jurlp("filter", "host", "^=", "w");
-						equals ( result.length, 1, "Discovered URLs by host (^=)" );
+						equal ( result.length, 1, "Discovered URLs by host (^=)" );
 
 						// $=
 						
 						result = obj.jurlp("filter", "host", "$=", "m");
-						equals ( result.length, 1, "Discovered URLs by host ($=)" );
+						equal ( result.length, 1, "Discovered URLs by host ($=)" );
 						
 						// *=
 
 						result = obj.jurlp("filter", "host", "*=", "ww.example.co");
-						equals ( result.length, 1, "Discovered URLs by host (*=)" );
+						equal ( result.length, 1, "Discovered URLs by host (*=)" );
 
 						// <
 
 						result = obj.jurlp("filter", "port", "<", "9999");
-						equals ( result.length, 1, "Discovered URLs by port (<)" );
+						equal ( result.length, 1, "Discovered URLs by port (<)" );
 
 						// <=
 
 						result = obj.jurlp("filter", "port", "<=", "8081");
-						equals ( result.length, 1, "Discovered URLs by port (<=)" );
+						equal ( result.length, 1, "Discovered URLs by port (<=)" );
 						
 						// >
 
 						result = obj.jurlp("filter", "port", ">", "8079");
-						equals ( result.length, 1, "Discovered URLs by port (>)" );
+						equal ( result.length, 1, "Discovered URLs by port (>)" );
 
 						// <=
 
 						result = obj.jurlp("filter", "port", ">=", "8080");
-						equals ( result.length, 1, "Discovered URLs by port (>=)" );
+						equal ( result.length, 1, "Discovered URLs by port (>=)" );
 
 						// regex
 
 						result = obj.jurlp("filter", "host", "regex", /(www)/);
-						equals ( result.length, 1, "Discovered URLs by host (regex)" );
+						equal ( result.length, 1, "Discovered URLs by host (regex)" );
 
 						/* Fail to find element */ 
 
 						// ==
 
 						result = obj.jurlp("filter", "host", "==", "www.example1.com");
-						equals ( result.length, 0, "Discovered URLs by host (==)" );
+						equal ( result.length, 0, "Discovered URLs by host (==)" );
 
 						// !=
 
 						result = obj.jurlp("filter", "host", "!=", "www.example1.com");
-						equals ( result.length, 1, "Discovered URLs by host (!=)" );
+						equal ( result.length, 1, "Discovered URLs by host (!=)" );
 
 						// ^=
 						
 						result = obj.jurlp("filter", "host", "^=", "x");
-						equals ( result.length, 0, "Discovered URLs by host (^=)" );
+						equal ( result.length, 0, "Discovered URLs by host (^=)" );
 
 						// $=
 						
 						result = obj.jurlp("filter", "host", "$=", "n");
-						equals ( result.length, 0, "Discovered URLs by host ($=)" );
+						equal ( result.length, 0, "Discovered URLs by host ($=)" );
 						
 						// *=
 
 						result = obj.jurlp("filter", "host", "*=", "ww.example1.co");
-						equals ( result.length, 0, "Discovered URLs by host (*=)" );
+						equal ( result.length, 0, "Discovered URLs by host (*=)" );
 
 						// <
 
 						result = obj.jurlp("filter", "port", "<", "8079");
-						equals ( result.length, 0, "Discovered URLs by port (<)" );
+						equal ( result.length, 0, "Discovered URLs by port (<)" );
 
 						// <=
 
 						result = obj.jurlp("filter", "port", "<=", "8079");
-						equals ( result.length, 0, "Discovered URLs by port (<=)" );
+						equal ( result.length, 0, "Discovered URLs by port (<=)" );
 						
 						// >
 
 						result = obj.jurlp("filter", "port", ">", "8081");
-						equals ( result.length, 0, "Discovered URLs by port (>)" );
+						equal ( result.length, 0, "Discovered URLs by port (>)" );
 
 						// <=
 
 						result = obj.jurlp("filter", "port", ">=", "8081");
-						equals ( result.length, 0, "Discovered URLs by port (>=)" );
+						equal ( result.length, 0, "Discovered URLs by port (>=)" );
 
 						// regex
 
 						result = obj.jurlp("filter", "host", "regex", /(wwww)/);
-						equals ( result.length, 0, "Discovered URLs by host (regex)" );
+						equal ( result.length, 0, "Discovered URLs by host (regex)" );
 
 
 					});
@@ -732,8 +732,8 @@
 								"watch", 
 								function ( element )
 								{
-									equals ( true, true, "Found element" );
-									equals ( element.jurlp ( "url" ).toString(), "http://www.example.com:8080/path/file.name?param1=value1&param2=value2&param3=value3#fragment", "Found element URL" );
+									equal ( true, true, "Found element" );
+									equal ( element.jurlp ( "url" ).toString(), "http://www.example.com:8080/path/file.name?param1=value1&param2=value2&param3=value3#fragment", "Found element URL" );
 								}
 							).jurlp ( "filter", "host", "=", "www.example.com" );
 
@@ -753,8 +753,8 @@
 								"watch", 
 								function ( element )
 								{
-									equals ( true, true, "Found element 1" );
-									equals ( element.jurlp ( "url" ).toString(), "https://www.newexample.com:8080/path/newfile.name?param1=value1&param2=value2&param3=value3#fragment", "Found element 1 URL" );
+									equal ( true, true, "Found element 1" );
+									equal ( element.jurlp ( "url" ).toString(), "https://www.newexample.com:8080/path/newfile.name?param1=value1&param2=value2&param3=value3#fragment", "Found element 1 URL" );
 								}
 							).jurlp ( "filter", "host", "=", "www.example1.com" ).jurlp ( "scheme", "https://" ).jurlp ( "host", "www.newexample.com" ).jurlp ( "path", "../newfile.name" );
 
@@ -763,8 +763,8 @@
 								"watch", 
 								function ( element )
 								{
-									equals ( true, true, "Found element 2" );
-									equals ( element.jurlp ( "url" ).toString(), "http://www.example2.com:8080/path/file.name?param1=value1&param2=value2&param3=value3#fragment", "Found element 2 URL" );
+									equal ( true, true, "Found element 2" );
+									equal ( element.jurlp ( "url" ).toString(), "http://www.example2.com:8080/path/file.name?param1=value1&param2=value2&param3=value3#fragment", "Found element 2 URL" );
 								}
 							).jurlp ( "filter", "host", "=", "www.example2.com" );
 
@@ -775,7 +775,7 @@
 
 							$( ".watch-test" ).append ( "<a id=\"unwatched\" href='http://www.example1.com:8080/path/file.name?param1=value1&param2=value2&param3=value3#fragment'></a>" );
 
-							equals ( $( ".watch-test a#unwatched" ).attr ( "href" ), "http://www.example1.com:8080/path/file.name?param1=value1&param2=value2&param3=value3#fragment", "Unwatched URL" );
+							equal ( $( ".watch-test a#unwatched" ).attr ( "href" ), "http://www.example1.com:8080/path/file.name?param1=value1&param2=value2&param3=value3#fragment", "Unwatched URL" );
 						}
 					);
 
@@ -791,7 +791,7 @@
 							//console.log ( elements );
 							//console.log ( $( "div.text-test" ).html ( ) );
 
-							equals ( $( "div.text-test" ).html ( ), $( "div.text-test-result" ).html ( ), "Element HTML" );
+							equal ( $( "div.text-test" ).html ( ), $( "div.text-test-result" ).html ( ), "Element HTML" );
 						}
 					);
 
@@ -804,7 +804,7 @@
 						{
 							var urlObject = $( ".javascript-test" ).jurlp ( "url" ) [ 0 ];
 
-							equals ( urlObject.toString ( ), $( ".javascript-test" ).attr ( "href" ), "jurlp(\"url\").toString()" );
+							equal ( urlObject.toString ( ), $( ".javascript-test" ).attr ( "href" ), "jurlp(\"url\").toString()" );
 
 							delete urlObject.javascript;
 							delete urlObject.toString;
@@ -826,19 +826,19 @@
 						{
 							var urlObject = $( ".mailto-test" ).jurlp ( "url" ) [ 0 ];
 
-							equals ( urlObject.toString ( ), $( ".mailto-test" ).attr ( "href" ), "jurlp(\"url\").toString()" );
+							equal ( urlObject.toString ( ), $( ".mailto-test" ).attr ( "href" ), "jurlp(\"url\").toString()" );
 
 							$( ".mailto-test" ).jurlp ( "user", "newuser" );
 
-							equals ( $( ".mailto-test" ).attr ( "href" ), "mailto:newuser@example.com?subject=Subject&body=Body", "jurlp(\"user\",\"newuser\")" );
+							equal ( $( ".mailto-test" ).attr ( "href" ), "mailto:newuser@example.com?subject=Subject&body=Body", "jurlp(\"user\",\"newuser\")" );
 
 							$( ".mailto-test" ).jurlp ( "host", "newexample.com" );
 
-							equals ( $( ".mailto-test" ).attr ( "href" ), "mailto:newuser@newexample.com?subject=Subject&body=Body", "jurlp(\"host\",\"newexample.com\")" );
+							equal ( $( ".mailto-test" ).attr ( "href" ), "mailto:newuser@newexample.com?subject=Subject&body=Body", "jurlp(\"host\",\"newexample.com\")" );
 
 							$( ".mailto-test" ).jurlp ( "query", { subject : "New%20subject", body : "New%20body" } );
 
-							equals ( $( ".mailto-test" ).attr ( "href" ), "mailto:newuser@newexample.com?subject=New%20subject&body=New%20body", "jurlp(\"query\",{subject:\"New subject\",body:\"New body\"})" );
+							equal ( $( ".mailto-test" ).attr ( "href" ), "mailto:newuser@newexample.com?subject=New%20subject&body=New%20body", "jurlp(\"query\",{subject:\"New subject\",body:\"New body\"})" );
 						}
 					);
 				}
