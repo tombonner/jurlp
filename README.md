@@ -1,7 +1,7 @@
-JQuery URL parser.
+jQuery URL parser.
 ==================
 
-JQuery URL parser plugin for parsing, manipulating, filtering and monitoring URLs in "href" and "src" attributes within arbitrary elements (including document.location.href), as well as creating anchor elements from URLs found in HTML/text.
+jQuery URL parser plugin for parsing, manipulating, filtering and monitoring URLs in "href" and "src" attributes within arbitrary elements (including document.location.href), as well as creating anchor elements from URLs found in HTML/text.
 
 **Version**
 
@@ -33,7 +33,7 @@ Files
 -----
 
     / ................. Project root.
-    |-jurlp.js ........ JQuery URL parser plugin source.
+    |-jurlp.js ........ jQuery URL parser plugin source.
     |-jurlp.min.js .... jurlp.js compressed using YUI Compressor.
     |-jurlp.html ...... JQuery URL parser plugin QUnit test suite.
     |-README.md ....... This file.
@@ -43,7 +43,7 @@ Files
 Requirements
 ------------
 
-[JQuery](http://jquery.com/)
+[jQuery](http://jquery.com/)
 
 URL naming scheme
 -----------------
