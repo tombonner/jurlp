@@ -29,6 +29,11 @@ Unit test
 
 Run the [QUnit test suite](http://tombonner.github.com/jurlp/jurlp.html).
 
+Validator
+---------
+
+Try the [URL validator](http://jsfiddle.net/seltar/nXLFG/12/show/).
+
 Files
 -----
 
