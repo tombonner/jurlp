@@ -420,3 +420,17 @@ Therefore, "mailto:" URLs can be fully parsed using this parser, but note that i
 ```
 
 Therefore, "javascript:" URLs can be fully parsed using this parser, but note that the current "document.location.href" will always be parsed/returned as the main URL object.
+
+### Alternatives ###
+
+If you don't like jurlp, you may like one of these:
+
+* [URI.js](https://github.com/medialize/URI.js) (thanks for the alternatives list!)
+* [The simple <a> URL Mutation "Hack"](http://jsfiddle.net/rodneyrehm/KkGUJ/) ([jsPerf comparison](http://jsperf.com/idl-attributes-vs-uri-js))
+* [URI Parser](http://blog.stevenlevithan.com/archives/parseuri)
+* [jQuery-URL-Parser](https://github.com/allmarkedup/jQuery-URL-Parser)
+* [URL.js](https://github.com/ericf/urljs)
+* [furl (Python)](https://github.com/gruns/furl)
+* [mediawiki Uri](https://svn.wikimedia.org/viewvc/mediawiki/trunk/phase3/resources/mediawiki/mediawiki.Uri.js?view=markup) (needs mw and jQuery)
+* [Google Closure Uri](http://closure-library.googlecode.com/svn/docs/closure_goog_uri_uri.js.html)
+* [URI.js by Gary Court](https://github.com/garycourt/uri-js)
